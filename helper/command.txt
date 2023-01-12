@@ -1,0 +1,76 @@
+
+pip3 install djoser
+pip3 install djangorestframework
+pip3 install markdown       # Markdown support for the browsable API.
+pip3 install django-filter  # Filtering support
+
+pip3 install django-cors-headers
+
+pip3 install python-dateutil
+pip install python-dateutil
+
+
+------------------- DB
+db yi doldurmak için
+#  python manage.py loaddata fix_models.json
+
+git push -f origin master
+
+pip freeze > requirements.txt
+
+manage.py flush  veri tabanını tertemiz eder
+
+
+-----------------------------------------------------------------
+
+
+
+------------
+
+def chunked_queryset(queryset, chunk_size):
+    """ Slice a queryset into chunks. """
+
+    start_pk = 0
+    queryset = queryset.order_by('pk')
+
+    while True:
+        # No entry left
+        if not queryset.filter(pk__gt=start_pk).exists():
+            break
+
+        try:
+            # Fetch chunk_size entries if possible
+            end_pk = queryset.filter(pk__gt=start_pk).values_list(
+                'pk', flat=True)[chunk_size - 1]
+
+            # Fetch rest entries if less than chunk_size left
+        except IndexError:
+            end_pk = queryset.values_list('pk', flat=True).last()
+
+        yield queryset.filter(pk__gt=start_pk).filter(pk__lte=end_pk)
+
+        start_pk = end_pk
+
+
+
+
+---------------------------------- Heroku ----------------------------------------------------
+
+herokuyu indir ve kur
+
+heroku login
+
+
+
+git remote -v  git listesini gör
+heroku create progisyTesting
+git remote -v  git listesini gör  yeni yarattığınıı göreceksin
+
+
+pip install gunicorn whitenoise
+
+pip freeze > requirements.txt      // oluştur
+
+psql progisy -c "GRANT ALL ON ALL TABLES IN SCHEMA public to progisyucel;"
+psql progisy -c "GRANT ALL ON ALL SEQUENCES IN SCHEMA public to progisyucel;"
+psql progisy -c "GRANT ALL ON ALL FUNCTIONS IN SCHEMA public to progisyucel;"

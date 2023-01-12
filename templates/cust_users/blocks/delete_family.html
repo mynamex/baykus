@@ -1,0 +1,100 @@
+{% load static %}
+{#------------------------- EDIT OWNER MODAL  ---------------------------------------------------#}
+
+
+<div class="card-header border-0" >
+
+    <div class="card-header">
+        Daireyi Boşalt !
+    </div>
+    <div class="card-body">
+        <h5 class="card-title">Dikkat Önemli Uyarı</h5>
+        <p class="card-text">Bu bölümde silme işlemi gerçekleşir bu işlemden sonra bu daire boş olarak anlamlandırılır.. Lütfen bu işlemden emin olunuz.</p>
+
+        <button type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#id_modal_delete_family" data-whatever="@fat">Anladım Sil</button>
+    </div>
+</div>
+
+
+<div class="modal fade" id="id_modal_delete_family" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Silme işlemini onaylayınız</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="recipient-name" id="" class="col-form-label">Bu işlemden sonra daire boş gözükecektir!</label>
+
+                    </div>
+
+                    <div class="form-check">
+                        <label for="id_checkbox_confirm_delete"></label><input class="form-check-input" type="checkbox" value="" id="id_checkbox_confirm_delete">
+                        <label class="form-check-label" for="defaultCheck1"> Evet ne yaptığımı biliyorum. </label>
+                        <small id="id_checkbox_confirm_delete_feed_back" class="form-text text-muted color" style="visibility: hidden"><p class="text-danger">* Lütfen onaylayınız </p></small>
+
+
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Vazgeç</button>
+                <button type="button" class="btn btn-outline-danger" id="id_bt_delete_family_confirm">Sil</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block javascripts %}
+
+    <script>
+
+        {#CLICK DELETE FAMILY#}
+        $("#id_bt_delete_family_confirm").click(function () {
+            if( $('#id_checkbox_confirm_delete').is(':checked') ){
+
+                $.ajax({
+                    type: 'post',
+                    url: "{% url 'family_view' %}",
+                    dataType: "json",
+                    headers: {
+                        "X-CSRFToken": getCookie("csrftoken")
+                    },
+                    data: {
+                        "go_to": "delete_family",
+                        "apartment_id": apartment_id,
+                        "family_id": family_id },
+                    "csrfmiddlewaretoken": '{{ csrf_token }}',
+                    success: function (response) {
+                        const {data:{desc},success}=response
+                        // if not valid user, alert the user
+
+                        if (success) {
+                            $('#id_modal_delete_family').modal('hide')
+                            empty_apartment_to_do()
+
+                        } else MyToastWarn(desc);
+                    },
+                    error: function (response) {
+                       MyToastError(response)
+                    }
+                })
+            }
+            else{
+                $("#id_checkbox_confirm_delete_feed_back").css("visibility", "visible");
+            }
+        });
+
+
+        $('#id_modal_delete_family').on('hidden.bs.modal', function (e) {
+            $('#id_checkbox_confirm_delete').prop('checked', false);
+            $("#id_checkbox_confirm_delete_feed_back").css("visibility", "hidden");
+        })
+
+
+    </script>
+{% endblock %}

@@ -1,0 +1,71 @@
+
+# linux
+sudo apt-get update
+sudo apt-get install python-pip python-dev libpq-dev postgresql postgresql-contrib
+
+sudo su - postgres
+
+psql
+
+CREATE DATABASE progisy;
+
+CREATE USER progisyucel WITH LOGIN ENCRYPTED PASSWORD 'mz305lola1918';
+
+ALTER ROLE progisyucel SET client_encoding TO 'utf8';
+ALTER ROLE progisyucel SET default_transaction_isolation TO 'read committed';
+ALTER ROLE progisyucel SET timezone TO 'UTC';
+
+GRANT ALL PRIVILEGES ON DATABASE progisy TO progisyucel;
+
+\q
+
+exit
+
+
+pip install django psycopg2
+
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'progisy',
+        'USER': 'progisyucel',
+        'PASSWORD': 'progisylola1918',  # mz305lola1918
+        'HOST': 'localhost',
+        'PORT': '',
+    }
+}
+
+
+https://www.digitalocean.com/community/tutorials/how-to-use-postgresql-with-your-django-application-on-ubuntu-14-04
+
+
+
+
+
+
+# ------------------------     windows kurulum  -------------------------
+
+
+https://www.youtube.com/watch?v=a_XruutaFvc&ab_channel=ReactDersleri
+
+path tanıtımını yap
+
+psql -d postgres -U postgres
+
+CREATE ROLE progisyucel LOGIN PASSWORD 'admin';
+
+ALTER ROLE progisyucel CREATEDB;
+
+# çıkış yap
+\q
+tekrar bağlan busefer kullanıcı adı ile
+psql -d postgres -U progisyucel
+
+# veri tabanı oluştur
+CREATE DATABASE progisy;
+\list
+
+
+# veritabanının içine girer sqllden yapıştır sonra
+\c progisy

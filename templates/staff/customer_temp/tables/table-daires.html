@@ -1,0 +1,116 @@
+<div id="jsGridDaires"></div>
+
+
+
+{% block javascripts %}
+
+    <script>
+        let selectedBlokId = 0;
+        $(document).ready(function () {
+
+            $("#daireContainer").css("visibility", "hidden");
+            $("#jsGridDaires").jsGrid({
+                width: "100%",
+                height: "360px",
+                inserting: true,
+                {#filtering: true,#}
+                selecting: true,
+                editing: true,
+                sorting: true,
+                {#autoload: true,#}
+                paging: true,
+                controller: {
+                    loadData: function () {
+                        let d = $.Deferred();
+
+                        $.ajax({
+                            method: 'GET',
+                           url:"{% url 'staff_me:apartments_view' %}",
+                            dataType: "json",
+                            data: {
+                                "account_id": {{ customer.pk }},
+                                "block_id": selectedBlokId,
+                                "csrfmiddlewaretoken": '{{ csrf_token }}'
+                            },
+                        }).done(function (response) {
+
+                            if (response.d_daires) {
+                                d.resolve(response.d_daires);
+                            }
+                        });
+
+                        return d.promise();
+                    }
+
+                },
+
+
+                onItemInserting: function (args) {
+
+                    $.ajax({
+                        method: 'POST', dataType: "json", async:false,
+                        url:"{% url 'staff_me:apartments_view' %}",
+                        data: {
+                            "in_go":"create",
+                            "account_id": {{ customer.pk }},
+                            "daire_name": args.item.name,
+                            "block_id": selectedBlokId,
+                            "is_active": args.item.is_active, //?args.item.is_active:null,
+                            "intercom_phone": args.item.intercom_phone,
+                            "csrfmiddlewaretoken": '{{ csrf_token }}'
+                        },
+                    }).done(function (response) {
+                        if (response.result) {
+                            args.item.id = response.apartment
+                            args.item.is_active = true
+                            MyToastSuccess("Yeni bir daire yaratıldı")
+                        } else {
+                            if (response.status_message)
+                                MyToastWarn(response.status_message);
+                            args.cancel = true;
+                        }
+                    });
+                },
+
+                onItemUpdating: function (args) {
+
+                    $.ajax({
+                        method: 'POST', dataType: "json", async:false,
+                        url:"{% url 'staff_me:apartments_view' %}",
+                        data: {
+                            "in_go":"update",
+                            "account_id": {{ customer.pk }},
+                            "daire_id": args.item.id,
+                            "daire_name": args.item.name,
+                            "intercom_phone": args.item.intercom_phone,
+                            "block_id": selectedBlokId,
+                            "is_active": args.item.is_active,
+                            "csrfmiddlewaretoken": '{{ csrf_token }}'
+                        },
+                    }).done(function (response) {
+                        if (response.result) {
+                            MyToastSuccess("Güncelleme Başarılı")
+                            $(".jsgrid-edit-mode-button").click()
+                        } else {
+                            if (response.status_message)
+                                MyToastWarn(response.status_message);
+                            args.cancel = true;
+                        }
+                    });
+                },
+                rowClick: function (args) {
+                    {#console.log(args.item.id);#}
+                },
+                fields: [
+                    {name: "id", title: "Id", type: "number", width: 10, visible: false, validate: "required"},
+                    {name: "name", title: "Daire", type: "text", width: 50, validate: "required"},
+                    {name: "intercom_phone", title: "İntercom", type: "text", width: 50},
+                    {name: "is_active", title: "Durum", type: "checkbox", width: 30},
+                    {type: "control", deleteButton: false}
+                ]
+            });
+
+            {#$("#jsGridDaires").jsGrid("sort", { field: "name", order: "desc" });#}
+        });
+    </script>
+{% endblock javascripts %}

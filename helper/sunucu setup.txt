@@ -1,0 +1,209 @@
+host ["212.47.245.29"]
+
+
+
+sudo apt install nginx
+sudo apt install -y python3-venv
+
+python3 -m venv venv
+
+source venv/bin/activate
+
+pip install django
+
+pip install gunicorn
+
+
+
+*********************************** yöntem 2 *************************************************
+
+
+
+
+
+
+*********************************** ssh keygen oluştur mak*************************************************
+//local makineden yazılacak
+
+# key oluşturduk
+ssh-keygen -b 4094
+
+# sunucuya keyi kopyaladık
+scp ~/.ssh/id_rsa.pub kedi@212.47.245.29:~/.ssh/authorized_keys
+
+
+
+-----sunucuyu açtık ---------------
+
+# kontrol ettik
+ls .ssh
+
+sudo chmod 700 ~/.ssh/  // yetki verdik
+sudo chmod 600 ~/.ssh/*   // yine verdik
+
+
+# buraya gir alttakileri düzelt
+sudo nano /etc/ssh/sshd_config
+-----sshd_config----
+PermitRootLogin no
+PasswordAuthentication no
+------------------------
+
+# ssh restart
+sudo systemctl restart sshd
+
+
+
+# güvenlik duvarı yükledik
+sudo apt-get install ufw
+
+# trafige izin verdik
+sudo ufw default allow outgoing
+sudo ufw default deny incoming
+
+# ssh için izin aldık
+sudo ufw allow ssh
+
+# django için porta yol verdik
+sudo ufw allow 8000
+
+# ufw yi çalıştırıyoruz ssh e rules vermeyi unutma
+sudo ufw enable
+# control et
+sudo ufw status
+
+
+
+---------- kurulum
+
+sudo apt install -y python3-venv
+download project
+python3 -m venv project/venv
+source venv/bin/activate
+
+# gerekli kütüphaneler kuruluyor
+pip3 install -r requirements.txt
+
+django-admin startproject myproject
+nano myproject/myproject/settings.py     değiştir host ["212.47.245.29"]
+
+STATIC_ROOT = os.path.join(BASE_DIR,'static')
+python3 manage.py collectstatic
+
+
+# nginx
+sudo apt install nginx libpq-dev
+
+# gunicornu test et
+gunicorn --bind 0.0.0.0:8000 ProgisyCallCenterServer.wsgi   # sunucunun çalışması lazım
+
+
+# gunicorn ayarlar
+
+# gunicorn servis dosyası oluştur
+sudo nano /etc/systemd/system/gunicorn.service
+
+# gunicorn.service içine yaz
+-------------------------------gunicorn.service----
+
+[Unit]
+Description=gunicorn daemon
+After=network.target
+
+[Service]
+User=kedi
+Group=www-data
+WorkingDirectory=/home/kedi/progisy_server
+ExecStart=/home/kedi/progisy_server/venv/bin/gunicorn --access-logfile - --workers 3 --bind unix:/home/kedi/progisy_server/ProgisyCallCenterServer/ProgisyCallCenterServer.sock ProgisyCallCenterServer.wsgi:appli$
+
+[Install]
+WantedBy=multi-user.target
+------------------------------------------------
+
+
+
+
+
+# gunicorn start
+sudo systemctl start gunicorn
+sudo systemctl enable  gunicorn
+
+# status gunicorn
+sudo systemctl status  gunicorn
+
+# yeniden başlad deaomu
+sudo systemctl daemon-reload
+
+# restart gunic
+sudo systemctl restart gunicorn
+
+
+
+# ngxi
+sudo nano /etc/nginx/sites-available/ProgisyCallCenterServer
+
+# dosyaya yaz
+--------ProgisyCallCenterServer
+server {
+    listen 80;
+    server_name 212.47.245.29;
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location /static/ {
+        root /home/kedi/progisy_server/ProgisyCallCenterServer;
+    }
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/home/kedi/progisy_server/ProgisyCallCenterServer/ProgisyCallCenterServer.sock;
+    }
+}
+
+------------------------
+
+#ngix çalıştır
+sudo ln -s /etc/nginx/sites-available/ProgisyCallCenterServer /etc/nginx/sites-enabled
+
+
+
+
+
+#test et
+sudo nginx -t
+
+
+# güvenliğe aç
+sudo ufw delete allow 8000
+sudo ufw allow 'Nginx Full'
+
+#reset
+sudo systemctl restart gunicorn
+sudo systemctl restart nginx
+
+
+
+
+# butün hersey enlatılmıs
+https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-16-04
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

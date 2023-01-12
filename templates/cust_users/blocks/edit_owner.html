@@ -1,0 +1,331 @@
+{% load static %}
+{#------------------------- EDIT OWNER MODAL  ---------------------------------------------------#}
+
+
+<div class="modal fade" id="id_modal_edit_owner" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Tapu yetkilisinin bilgilerini oluşturun</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+
+
+                {# isim  #}
+                <div class="input-group mb-2">
+                    <label class="form-control-label" >İsim</label>
+                    <div class="input-group">
+                        <label for="id_edit_owner_name"></label><input
+                            value=""
+                            type="text" maxlength="50" class="form-control text-capitalize" id="id_edit_owner_name"/>
+                    </div>
+                    <div class="valid-feedback">Success! You've done it.</div>
+                    <span class="form-text text-muted">Bu dairede oturacak en yetkili kişi </span>
+                </div>
+
+                {# Tel  #}
+                <div class="input-group mb-4">
+                    <label class="form-control-label" >Telefon</label>
+                    <div class="input-group">
+                        <label for="id_edit_owner_phone"></label><input
+                            value=""
+                            maxlength="11" type="number"
+                            oninput="if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                            class="form-control" id="id_edit_owner_phone"/>
+                    </div>
+                    <div class="valid-feedback">Success! You've done it.</div>
+                    <span class="form-text text-muted">Bu alan zorunludur </span>
+                </div>
+
+                {#                frame residents select#}
+                <div class="container px-1" id="id_div_select_frame">
+                    <div class="row gx-1">
+
+                        <div class="col">
+                            <div class="p-3 border bg-light">
+                                <div class="input-group mb-4">
+                                    <label class="form-control-label" >Bu kişi daire sakinlerinden mi ?</label>
+                                    <div class="input-group">
+                                        <input type="checkbox" id="id_checkbox_owner_is_residents" aria-label="Checkbox for following text input">
+                                        <div class="valid-feedback">Success! You've done it.</div>
+                                    </div>
+                                </div>
+                                {# select #}
+                                <div class="input-group mb-2" id="id_div_owner_select_in_residents">
+                                    <label class="form-control-label" >Sakinler </label>
+                                    <div class="input-group">
+                                        <label for="id_select_residents_for_owner"></label>
+                                        <select aria-label="Default select example" disabled id="id_select_residents_for_owner" class="form-control">
+                                            <option value="">--seç--</option>
+                                        </select>
+
+                                    </div>
+                                    <div class="valid-feedback">Success! You've done it.</div>
+                                    <span class="form-text text-muted">Bu kişilerden seçebilirsiniz</span>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Vazgeç</button>
+                <button type="button" class="btn btn-outline-success" id="id_button_submit"  onclick="uploadEditOwnerFile();">Oluştur</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="id_modal_confirm_edit_owner" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Dikkat !</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="recipient-name" id="" class="col-form-label">Tapu yetkilisinin adını değiştirmek üzeresiniz !</label>
+
+                    </div>
+
+                    <div class="form-check">
+                        <label for="id_checkbox_confirm_change_owner"></label><input class="form-check-input" type="checkbox" value="no_select" id="id_checkbox_confirm_change_owner">
+                        <label class="form-check-label" for="defaultCheck1"> Evet ne yaptığımı biliyorum. </label>
+                        <small id="id_valid_confirm_change_owner" class="form-text text-muted color" style="visibility: hidden"><p class="text-danger">* Lütfen onaylayınız </p></small>
+
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Vazgeç</button>
+                <button type="button" class="btn btn-outline-success" id="id_bt_edit_owner_confirm">Değiştir</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block javascripts %}
+
+    <script>
+
+        {# select owner seç#}
+        $("#id_select_residents_for_owner").change(function (e) {
+            e.preventDefault();
+
+            let name = $(this).children("option:selected").text();
+
+            if (name !=="Seç"){
+                let ap = $(this).children("option:selected").val();
+                const value =  ap.split(":");
+
+                $("#id_edit_owner_name").val(name)
+                $("#id_edit_owner_phone").val(value[0])
+            }
+        });
+
+        $("#id_checkbox_owner_is_residents").change(function (e) {
+
+            e.preventDefault();
+
+            if( $(this).is(':checked') ){
+                $("#id_edit_owner_name").prop("disabled",true)
+                $("#id_edit_owner_phone").prop("disabled",true)
+                $("#id_select_residents_for_owner").prop("disabled",false)
+
+            }else {
+                $("#id_edit_owner_name").prop("disabled",false)
+                $("#id_edit_owner_phone").prop("disabled",false)
+                $("#id_select_residents_for_owner").prop("disabled",true)
+            }
+        });
+
+
+        $("#id_bt_edit_owner_confirm").click(function () {
+
+            if( $('#id_checkbox_confirm_change_owner').is(':checked') ){
+                const name= $("#id_edit_owner_name").val()
+                const phone=$("#id_edit_owner_phone").val()
+
+                  let ap = $("#id_select_residents_for_owner").children("option:selected").val();
+                  const value =  ap.split(":");
+
+                $.ajax({
+                    method: 'POST',
+                    url: "{% url 'family_view' %}",
+                    dataType: "json",
+                    data:{
+                        "go_to":"edit_owner",
+                        "phone": phone,
+                        "name": name,
+                        "is_owner_in_residents":   $("#id_checkbox_owner_is_residents").is(':checked'),
+                        "in_families_owner_id": value[1],
+                        "apartment_id": apartment_id,
+                        "csrfmiddlewaretoken": '{{ csrf_token }}' },
+                }).done(function(response) {
+                    const {data:{desc},success}=response
+
+                    if (success) {
+
+                        $("#id_owner_name").text(name);
+                        $("#id_owner_phone").text(phone);
+
+                          if (d_persons_data) {
+                              if ($("#id_checkbox_owner_is_residents").is(':checked')) {
+                                  {#kendisi oturuyor#}
+                                  $("#id_is_owner").text("Kendisi");
+
+                              } else {
+                                  {#"kiracı"#}
+                                  $("#id_is_owner").text("Kiracı Oturuyor");
+                              }
+                          }else{
+                                 $("#id_is_owner").text("-");
+                                 $("#id_apartment_status").text("Daire Boş")
+                          }
+
+
+                        $('#id_modal_confirm_edit_owner').modal('hide')
+
+                        MyToastSuccess("Güncelleme Başarılı")
+
+                    }
+                    else {
+                        MyToastWarn(desc);
+                    }
+                });
+
+            }else{
+                $("#id_valid_confirm_change_owner").css("visibility", "visible");
+            }
+        });
+
+        function uploadEditOwnerFile() {
+
+            const name= $("#id_edit_owner_name").val()
+            const phone=$("#id_edit_owner_phone").val()
+
+
+            let flag_ok = true
+
+            if (name.length < 4){
+                $("#id_edit_owner_name").addClass('is-invalid')
+                $("#id_edit_owner_name").attr("placeholder", "*zorunlu alan")
+                flag_ok = false
+            }
+
+            if (phone.length !== 11){
+                $("#id_edit_owner_phone").attr("placeholder", "*zorunlu alan")
+                $("#id_edit_owner_phone").addClass('is-invalid')
+                flag_ok = false
+            }
+
+
+            if (!flag_ok){
+                console.log("hatalı girişler var")
+                {#alert("hatalı girişler var")#}
+                return
+            }
+
+            if (apartment_id === null){
+                alert("dikkat daire id çözümlenemedi")
+                return
+            }
+
+            let owner_select = $("#id_checkbox_confirm_change_owner")
+
+            if ($('#id_checkbox_confirm_change_owner').is(':checked') &&  owner_select.children("option:selected").val() ==="no_select" ){
+                owner_select.removeClass('is-valid')
+                owner_select.removeClass('is-invalid')
+                return
+            }
+
+            if($("#id_owner_phone").text() !== phone || $("#id_owner_name").text() !== name) {
+                $('#id_modal_confirm_edit_owner').modal('show')
+            }
+            $('#id_modal_edit_owner').modal('hide')
+        }
+
+        $(function () {
+
+            $('#id_modal_edit_owner').on('show.bs.modal', function (e) {
+
+                $("#id_edit_owner_phone").val($("#id_owner_phone").text())
+                $("#id_edit_owner_name").val($("#id_owner_name").text())
+
+                {#$("#id_select_residents_for_owner").empty().append('<option value = "">Seç</option>');#}
+                {#clear select value#}
+
+                $('#id_select_residents_for_owner').find('option').remove().end().append('<option value="no_select">Seç</option>').val();
+
+                if (d_persons_data){
+                    $("#id_div_select_frame").css("visibility", "visible");
+                    let options = '';
+                    d_persons_data.forEach(ap => {
+                           if (["day", "das"].includes(ap.categories)){
+                             {#options += `<option  value=${ap.phone}:${ap.pk}>${ap.name}</option>`;#}
+
+                               options += `<option  value=${ap.phone}:${ap.pk}>${ap.name}</option>`;
+                        }
+
+                    })
+                    $("#id_select_residents_for_owner").append(options);
+                }else {
+                    $("#id_div_select_frame").css("visibility", "hidden");
+                }
+            })
+
+            $('#id_modal_confirm_edit_owner').on('hidden.bs.modal', function (e) {
+                $(this)
+                    .find("input,textarea,select")
+                    .val('')
+                    .end()
+                    .find("input[type=checkbox], input[type=radio]")
+                    .prop("checked", "")
+                    .end();
+            })
+        });
+
+        $('#id_edit_owner_phone').keypress(function(event){
+            if ($(this).val().length ===11){
+                $(this).removeClass('is-invalid')
+                $(this).addClass('is-valid')
+            }else{
+                $(this).removeClass('is-valid')
+                $(this).addClass('is-invalid')
+
+            }
+        });
+
+        $('#id_edit_owner_name').keypress(function(event){
+            if ($(this).val().length > 3){
+                $(this).removeClass('is-invalid')
+                $(this).addClass('is-valid')
+            }else{
+                $(this).removeClass('is-valid')
+                $(this).addClass('is-invalid')
+            }
+        });
+
+
+    </script>
+{% endblock %}
+
+{#2022-11-24 07:58:07.819285 ac#}
+{#2022-11-24T07:58:07.819285#}

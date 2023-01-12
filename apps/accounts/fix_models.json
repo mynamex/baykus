@@ -1,0 +1,111 @@
+[
+  {
+    "model": "accounts.ReasonForVisits",
+    "pk": 1,
+    "fields": {
+      "reason_name": "Misafir"
+    }
+  },
+  {
+    "model": "accounts.ReasonForVisits",
+    "pk": 2,
+    "fields": {
+      "reason_name": "Sipariş"
+    }
+  },
+  {
+    "model": "accounts.ReasonForVisits",
+    "pk": 3,
+    "fields": {
+      "reason_name": "Kargo"
+    }
+  },
+  {
+    "model": "accounts.ReasonForVisits",
+    "pk": 4,
+    "fields": {
+      "reason_name": "Tadilat"
+    }
+  },
+  {
+    "model": "accounts.ReasonForVisits",
+    "pk": 5,
+    "fields": {
+      "reason_name": "Teknik Servis"
+    }
+  },
+  {
+    "model": "accounts.ReasonForVisits",
+    "pk": 6,
+    "fields": {
+      "reason_name": "Temizlik"
+    }
+  },
+  {
+    "model": "accounts.ReasonForVisits",
+    "pk": 7,
+    "fields": {
+      "reason_name": "Diger"
+    }
+  },
+
+
+  {
+    "model": "accounts.ReasonAnswer",
+    "pk": 1,
+    "fields": {
+      "answer_name": "Kabul Edildi"
+    }
+  },
+  {
+    "model": "accounts.ReasonAnswer",
+    "pk": 2,
+    "fields": {
+      "answer_name": "Red Edildi"
+    }
+  },
+  {
+    "model": "accounts.ReasonAnswer",
+    "pk": 3,
+    "fields": {
+      "answer_name": "Ulaşılamıyor"
+    }
+  }
+  ,
+  {
+      "model": "accounts.ReasonAnswer",
+      "pk": 4,
+      "fields": {
+        "answer_name": "Farklı Numara Dene"
+      }
+    }
+
+
+
+   ,
+     {
+         "model": "accounts.ModuleType",
+         "pk": 1,
+         "fields": {
+           "module_type": "intercom"
+         }
+       }
+    ,
+    {
+         "model": "accounts.ModuleType",
+         "pk": 2,
+         "fields": {
+           "module_type": "telefon"
+         }
+       }
+    ,
+     {
+         "model": "accounts.ModuleType",
+         "pk": 3,
+         "fields": {
+           "module_type": "gsm_modul"
+         }
+       },
+
+]
+

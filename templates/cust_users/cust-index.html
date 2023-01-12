@@ -1,0 +1,175 @@
+{% extends 'layouts/../layouts/base.html' %}
+
+{% block title %} Dashboard {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <!-- Header -->
+    <div class="header bg-primary pb-6">
+        <div class="container-fluid">
+            <div class="header-body">
+                {#                <div class="row align-items-center py-4">#}
+                {#                    <div class="col-lg-6 col-7">#}
+                {#                    </div>#}
+                {#                    <div class="col-lg-6 col-5 text-right">#}
+                {#                        <p>"hellos</p>#}
+                {#                    </div>#}
+                {#                </div>#}
+                <!-- Card stats -->
+                <div class="row">
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card card-stats">
+                            <!-- Card body -->
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Şube Sayısı</h5>
+                                        <span id="id_gates_count" class="h2 font-weight-bold  text-white mb-0"></span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-gradient-orange text-white rounded-circle shadow">
+                                            <i class="ni ni-chart-pie-35"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="mt-3 mb-0 text-sm">
+                                    <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> </span>
+                                    <span class="text-nowrap"></span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card card-stats">
+                            <!-- Card body -->
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Cihazlar</h5>
+                                        <span class="h2 font-weight-bold text-white mb-0" id="id_blocks_count"></span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-gradient-green text-white rounded-circle shadow">
+                                            <i class="ni ni-money-coins"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="mt-3 mb-0 text-sm">
+                                    <span class="text-success mr-2"><i class="fa fa-arrow-up"></i></span>
+                                    <span class="text-nowrap" style="color:#8898aa" ></span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card card-stats">
+                            <!-- Card body -->
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Birimler</h5>
+                                        <span id="id_apartment_count" class="h2 font-weight-bold text-white mb-0"></span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-gradient-info text-white rounded-circle shadow">
+                                            <i class="ni ni-chart-bar-32"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="mt-3 mb-0 text-sm">
+                                    <span class="text-success mr-2" id="id_apartment_avg"><i class="fa fa-arrow-up"></i> 3.48%</span>
+                                    <span class="text-nowrap " style="color:#8898aa" ></span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page content -->
+    <div class="container-fluid mt--6">
+        <div class="row">
+            <div class="col-xl-8">
+                <div class="card bg-default">
+                    <div class="card-header bg-transparent">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h6 class="text-light text-uppercase ls-1 mb-1">30 günlük kayıtlar gösterilmektedir</h6>
+                                <h5 class="h3 text-white mb-0">Giriş Trafiği</h5>
+                            </div>
+                            <div class="col">
+                                <ul class="nav nav-pills justify-content-end">
+                                    {#                                    <a href="javascript:go_get_answer_chart_data()" class="nav-link py-2 px-3" >#}
+                                    {#                                        <span class="d-none d-md-block">Yenile 4</span>#}
+                                    {#                                    </a>#}
+                                    <a href="javascript:go_get_answer_chart_data()" class="btn btn-sm btn-primary">Yenile</a>
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- Chart -->
+                        <canvas id="chart-sales-dark1" class="chart-canvas" data-value=""></canvas>
+                    </div>
+                </div>
+            </div>
+            <!-- Giriş trafic -->
+            <div class="col-xl-4">
+                <div class="card">
+                    <div class="card-header border-0">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h6 class="text-light text-uppercase ls-1 mb-1">30 günlük kayıt</h6>
+                                <h3 class="mb-0 text-white" id="id_sum_traffic"></h3>
+                            </div>
+                            <div class="col text-right">
+                                <a href="javascript:go_get_reason_chart_data()" class="btn btn-sm btn-primary">Yenile</a>
+                            </div>
+
+                            {#                             <div class="col text-right">#}
+                            {#                                <a href="javascript:go_test()" class="btn btn-sm btn-primary">test</a>#}
+                            {#                            </div>#}
+
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <!-- Projects reason -->
+                        <table class="table align-items-center table-flush"  id="id_table_reason">
+                            <thead class="" style="background-color: #1c1c1c" >
+                            <tr >
+                                <th scope="col">Ziyaret Sebebi</th>
+                                <th scope="col">Ziyaret Sayısı</th>
+                                <th scope="col">Avaraj</th>
+                            </tr>
+                            </thead>
+                            <tbody id="id_tbody_reason">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        {% include "includes/../includes/footer.html" %}
+    </div>
+
+{% endblock content %}
+
+<!-- Specific JS goes HERE -->
+{% block javascripts %}
+
+    <script src="/static/assets/vendor/chart.js/dist/Chart.min.js"></script>
+
+    <script>
+
+    </script>
+
+
+{% endblock javascripts %}

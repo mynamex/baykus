@@ -1,0 +1,112 @@
+
+
+.controls {
+  margin: 10px;
+}
+
+.summary {
+  font-weight: bold;
+}
+
+/* header row */
+.jsgrid-header-row>.jsgrid-header-cell {
+  background-color: #46435d;
+
+  color: white;
+  font-weight: bold;
+    border: 1px solid #46435d;
+
+}
+
+/* rows */
+.jsgrid-row>.jsgrid-cell {
+  background-color: #6f6d81;
+     color: papayawhip;
+  border: 1px solid #6f6d81;
+}
+
+/* alternate rows */
+.jsgrid-alt-row>.jsgrid-cell {
+  background-color: #626177;
+   border: 1px solid  #626177;
+     color: papayawhip;
+}
+
+/* editing row */
+.jsgrid-edit-row>.jsgrid-cell {
+  background-color: #B0BED9;
+}
+
+.jsgrid-header-scrollbar::-webkit-scrollbar {
+	visibility: hidden;
+
+}
+.jsgrid-header-scrollbar::-webkit-scrollbar-track {
+
+    background-color: #46435d;
+}
+
+.jsgrid-grid-body {
+	border: 1px solid #46435d;
+
+}
+
+.jsgrid-alt-row:first-child .jsgrid-cell {
+		border-top: #626177;
+	}
+.jsgrid-row:first-child .jsgrid-cell {
+    border-top: none;
+}
+
+.jsgrid-table{
+    /*border: 1px solid #626177;*/
+}
+.jsgrid-cell2 {
+     border: 1px solid #46435d;
+}
+
+.jsgrid-grid-header{
+    border: 1px solid #46435d;
+}
+
+.jsgrid-filter-row > .jsgrid-cell  {
+	border: 1px solid #46435d;
+    background:#46435d;
+
+}
+.jsgrid-insert-row > .jsgrid-cell {
+	border: 1px solid #46435d;
+	border-bottom: 0;
+    background:#46435d;
+}
+.jsgrid-edit-row > .jsgrid-cell {
+	border: 1px solid #46435d;
+	border-bottom: 0;
+    background:#46435d;
+}
+
+.jsgrid-nodata-row > .jsgrid-cell {
+	background:#46435d;
+}
+
+/* .jsgrid-grid-header,*/
+/*.jsgrid-grid-body,*/
+/*.jsgrid-header-row > th,*/
+/*.jsgrid-filter-row > td,*/
+/*.jsgrid-insert-row > td,*/
+/*.jsgrid-edit-row > td {*/
+/*  background-color: #6f42c1;*/
+/*}*/
+
+
+/*#322f4b*/
+/**/
+
+/*jsgrid-button jsgrid-mode-button jsgrid-insert-mode-button*/
+
+
+
+/*.jsgrid-grid-body::-webkit-scrollbar-track {*/
+
+/*    background-color: #46435d;*/
+/*}*/

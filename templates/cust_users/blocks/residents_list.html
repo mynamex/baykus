@@ -1,0 +1,469 @@
+<div id="jsGridResidents"></div>
+
+{#<div class="modal" id="dialog">#}
+{#    <div class="modal-dialog">#}
+{#        <div class="modal-body">#}
+{#            <img id="imagePreview"/>#}
+{#        </div>#}
+{#    </div>#}
+{#</div>#}
+
+<!-- Modal -->
+<!-- Large modal -->
+
+<div class="modal fade bd-example-modal-lg" id="dialog" tabindex="-1" role="dialog" style= "background-color: #626177"
+     aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalScrollableTitle">Kişi bilgisi</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <div class="col-12">
+                    <div class="card card-profile card-plain">
+                        <div class="row">
+                            <div class="col-lg-5">
+                                <a href="javascript:;">
+                                    <div class="position-relative">
+                                        <div class="blur-shadow-image">
+                                            <img class="w-100 rounded-3 shadow-lg" id="imagePreview">
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-lg-7 ps-0 my-auto">
+                                <div class="card-body text-left">
+                                    <div class="p-md-0 pt-3">
+                                        <h5 class="font-weight-bolder mb-0 text-white" id="id_p_profile_name"></h5>
+                                        <p class="text-uppercase text-sm font-weight-bold mb-2" id="id_p_who">
+
+                                        </p>
+                                    </div>
+                                    <p class="mb-4">
+                                        Bu kişi bu dairede yaşıyor..
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                {#    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>#}
+                {#    <button type="button" class="btn btn-primary">Save changes</button>#}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+{% block javascripts %}
+    <script>
+
+        window.rljs = {
+            uploadFile: null
+        };
+
+
+
+        {#------------------------Residents -------------------------------------------------------------------#}
+        $(function () {
+
+
+             const ResidentList = $("#jsGridResidents").jsGrid({
+                width: "100%",
+                height: "460px",
+                paging: false,
+                inserting: true,
+                //filtering: true,
+                selecting: true,
+                editing: true,
+                sorting: true,
+                autoload: false,
+                //  paging: true,
+                loadMessage: "Lütfen bekleyin...",
+                deleteConfirm: "Eminmisiniz?",
+                invalidMessage: "Hatalı Data Girişi!",
+                gridview: true,
+
+                controller: {
+                    loadData: function () {
+                        let d = $.Deferred();
+                        {#d.resolve(d_person_data)#}
+                        return d.promise();
+                    }
+                },
+
+                onItemInserting: function (args) {
+                    const person_name_is_unique = d_persons_data.find(person => person.name === args.item.name)
+
+                    if (person_name_is_unique.length){
+                        MyToastWarn("bu isimde birisi zaten var")
+                         args.cancel = true;
+                         return
+                    }
+
+                    let formData = new FormData();
+
+                    if (args.item.picture){
+                      formData.append("is_picture", "1");
+                      formData.append("picture", args.item.picture, args.item.picture.name);
+                    }else{
+                        formData.append("is_picture", "0");
+                    }
+
+                    formData.append('family_id', family_id);
+                    formData.append('apartment_id', apartment_id);
+                    formData.append('go_to', "create_person");
+                    formData.append('name', args.item.name);
+                    formData.append('ssn', args.item.ssn);
+                    formData.append('phone', args.item.phone);
+                    formData.append('categories', args.item.categories);
+                    formData.append('email', args.item.email);
+                    formData.append('data_created', args.item.data_created);
+                    formData.append('status', args.item.status);
+                    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+                    let ajaxOptions = {
+                        method: 'POST',
+                        url: "{% url 'family_view' %}",
+                        async: false, //?!?
+                        //dataType: "json",
+                        contentType: false,
+                        enctype: 'multipart/form-data',
+                        processData: false,
+                        data: formData,
+                        success: function (response) {
+                            const {success} = response
+                            if (success) {
+                                const {data} = response
+                                args.item.pk =data.added_id
+                                MyToastSuccess("Kişi Eklendi")
+                                $(".jsgrid-insert-mode-button").click()
+
+                            } else {
+                                const {data: {desc}} = response
+                                MyToastWarn(desc);
+                            }
+                             args.cancel = true;
+                        },
+                        error: function (err) {
+                            MyToastError(err);
+                        }
+                    }
+
+                    $.ajax(ajaxOptions);
+                },
+
+                onItemUpdating: function (args) {
+
+
+                    if (args.item.status === false) {
+                          const is_it_parent_person = ResidentList.jsGrid("option", "data").find(x => x.pk ===args.item.pk)
+                        {#const is_it_parent_person = d_persons_data.find(person => person.pk === args.item.pk)#}
+
+                        if (is_it_parent_person.categories === "day") {
+                            MyToastWarn("ev yetkilisinin durumu pasif yapılınamaz !")
+                            args.cancel = true;
+                            return
+                        }
+                    }
+
+                    if (args.item.categories === "day") {
+                        {#const is_it_parent_person_count = d_persons_data.filter(person => person.categories === "day")#}
+                        const is_it_parent_person_count = ResidentList.jsGrid("option", "data").find(x => x.categories === "day")
+
+                        if (is_it_parent_person_count.length > 1) {
+                            MyToastWarn("Önce dairede en az bir yetkili kişi belirtilmelidir!")
+                            args.cancel = true;
+                            return
+                        }
+                    }
+                    {#const person_name_is_unique = d_persons_data.filter(person => person.name === args.item.name)#}
+                   const person_name_is_unique = ResidentList.jsGrid("option", "data").find(x => x.name ===args.item.name)
+
+
+                    if (person_name_is_unique.length){
+                        if (args.item.pk  !== person_name_is_unique[0].pk){
+                            MyToastWarn("Bu isimde birisi zaten var")
+                         args.cancel = true;
+                         return
+                        }
+                    }
+
+
+                    let formData = new FormData();
+
+                    if (args.item.picture){
+                      formData.append("is_picture", "1");
+                      formData.append("picture", args.item.picture, args.item.picture.name);
+                    }else{
+                        formData.append("is_picture", "0");
+                    }
+
+                    formData.append('family_id', family_id);
+                    formData.append('apartment_id', apartment_id);
+                    formData.append('go_to', "edit_person");
+                    formData.append('name', args.item.name);
+                    formData.append('person_id', args.item.pk);
+                    formData.append('ssn', args.item.ssn);
+                    formData.append('phone', args.item.phone);
+                    formData.append('categories', args.item.categories);
+                    formData.append('email', args.item.email);
+                    formData.append('data_created', args.item.data_created);
+                    formData.append('status', args.item.status);
+                    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+                    let ajaxOptions = {
+                        method: 'POST',
+                        url: "{% url 'family_view' %}",
+                        async: false, //?!?
+                        //dataType: "json",
+                        contentType: false,
+                        enctype: 'multipart/form-data',
+                        processData: false,
+                        data: formData,
+                        success: function (response) {
+                            const {success} = response
+                            if (success) {
+                                const {data} = response
+                                {#console.log(args.item.picture)#}
+                                {#$("#jsGridResidents").jsGrid("option", "data", data.person_data);#}
+                                MyToastSuccess(data.desc)
+                                $(".jsgrid-edit-mode-button").click()
+                            } else {
+
+                                const {data: {desc}} = response
+                                MyToastWarn(desc)
+                                args.cancel = true;
+                            }
+                        },
+                        error: function (err) {
+                            MyToastError(err);
+                        }
+                    }
+                    $.ajax(ajaxOptions);
+                },
+                rowClick: function (args) {
+                    $("#id_p_who").text(args.item.categories)
+                    $("#id_p_profile_name").text(args.item.name)
+                    $("#imagePreview").attr("src", 'https://progisy.b-cdn.net/persons/' + args.item.picture);
+                    $("#dialog").modal("toggle");
+                },
+                fields: [
+                    {
+                        name: "categories", width: 110, title: "Kategori", type: "select", selectedIndex: 0,
+                        items: [
+                            {Name: "Seç", Id: ""},
+                            {Name: "Daire Yetkilisi", Id: "day"},
+                            {Name: "Daire Sakini", Id: "das"},
+                            {Name: "Temizlikci", Id: "tem"},
+                            {Name: "Görevli", Id: "gor"},
+
+                        ], valueField: "Id", textField: "Name", validate: function (value, item) {
+                            return item.categories;
+                        }
+                    },
+                    {
+                        name: "picture",
+                        title: "img",
+                        width: 60,
+
+                        itemTemplate: function (val, item) {
+
+                            if (!val){
+                               const person = ResidentList.jsGrid("option", "data").find(x => x.pk ===item.pk)
+
+                                console.log("person", person)
+
+                            if (person){
+                               val = person.picture
+                            }
+
+                            }
+                            return $("<img>").attr("src", 'https://progisy.b-cdn.net/persons/' + val).css({
+                                height: 40,
+                                width: 40
+                            })
+                        },
+                        insertTemplate: function () {
+                            let insertControl = this.insertControl = $("<input>")
+                                .attr('id', "insertfileupload")
+                                .prop("type", "file");
+
+                            insertControl[0].addEventListener('change', function (e) {
+                                if (e.target.files) {
+                                    let imageFile = e.target.files[0];
+                                    let reader = new FileReader();
+                                    reader.onload = function (e) {
+                                        let img = document.createElement("img");
+                                        img.onload = function (event) {
+
+                                            // Dynamically create a canvas element
+                                            window.rljs.uploadFile = imageResize(img,imageFile);
+                                        }
+                                        img.src = e.target.result;
+                                    }
+                                    reader.readAsDataURL(imageFile);
+                                }
+                            });
+                            return insertControl;
+                        },
+                        insertValue: function () {
+                            let file = window.rljs.uploadFile;
+                            console.log("-------------", file)
+                            {#window.rljs = null;#}
+                            return file;
+                        },
+
+                        editTemplate: function(value) {
+                            let editControl = this.insertControl = $("<input>")
+                                .attr('id', "editfileupload")
+                                .prop("type", "file");
+
+                            editControl[0].addEventListener('change', function (e) {
+                                if (e.target.files) {
+                                    let imageFile = e.target.files[0];
+                                    let reader = new FileReader();
+                                    reader.onload = function (e) {
+                                        let img = document.createElement("img");
+                                        img.onload = function (event) {
+
+                                            // Dynamically create a canvas element
+                                            window.rljs.uploadFile = imageResize(img,imageFile);
+                                        }
+                                        img.src = e.target.result;
+                                    }
+                                    reader.readAsDataURL(imageFile);
+                                }
+                            });
+
+                            return editControl;
+                        },
+                        editValue :function (){
+                            let file = window.rljs.uploadFile;
+                            console.log("-------------", file)
+                            {#window.rljs = null;#}
+                            return file;
+                        },
+                        align: "center",
+
+
+                    },
+                    {name: "pk", title: "Id", type: "number", width: 1, visible: false},
+                    {
+                        name: "ssn", title: "tc", type: "text", width: 120,
+                        _createTextBox: function () {
+                            let $input = jsGrid.fields.text.prototype._createTextBox.call(this);
+                            return $input.attr("maxlength", 11);
+                        },
+
+                        validate: [
+                            function (value, item) {
+
+                                if (item.ssn.length > 0) {
+                                    return item.ssn.match(/^\d{11}$/)
+                                } else return true
+                            }]
+
+                    },
+                    {
+                        name: "name",
+                        insertTemplate: function() {
+                            var $result = jsGrid.fields.text.prototype.insertTemplate.call(this); // original input
+
+                            {#$result.attr("class", "status text-capitalize");#}
+                            return $result;
+                        },
+                        title: "isim", type: "text", width: 150,
+                        validate: {
+                            validator: "rangeLength", param: [4, 50],
+                            message: function (value, item) {
+                                return "*isim en az 4 harften oluşmalıdır";
+                            }
+                        },
+
+                        _createTextBox: function () {
+                            let $input = jsGrid.fields.text.prototype._createTextBox.call(this);
+                            return $input.attr("maxlength", 50);
+                        }
+                    },
+                    {
+                        name: "phone",
+                        title: "tel",
+                        type: "text",
+                        width: 120,
+                        _createTextBox: function () {
+                            let $input = jsGrid.fields.text.prototype._createTextBox.call(this);
+                            $input.val('');
+                            return $input.attr("maxlength", 11);
+                        },
+
+                        validate: [
+                            {
+                                validator: "rangeLength", param: [10, 12],
+                                message: function (value, item) {
+                                    return "*Telefon 11 rakamdan oluşmalıdır";
+                                }
+                            },
+                            function (value, item) {
+                                if (item.ssn.length > 0) {
+                                    return item.ssn.match(/^\d{11}$/)
+                                } else return true
+                            }
+                        ]
+                    },
+                    {
+                        name: "email", title: "email", type: "text", width: 150,
+                        _createTextBox: function () {
+                            let $input = jsGrid.fields.text.prototype._createTextBox.call(this);
+                            return $input.attr("maxlength", 50);
+                        }
+                    },
+                    {name: "status", title: "durum", type: "checkbox", width: 100, sorting: true},
+                    {
+                        name: "data_created", title: "tarih", type: "text", width: 150, sorting: true,
+
+                        /*itemTemplate: function(value, item) {
+                            if (value){
+                                const [date, time] = value.split("T")
+                                return $("<span>").attr("class", "status text-capitalize")
+                                    .text(date+ " " + time.split(".")[0])
+                            }
+
+                        },
+                        editTemplate: function(value) {
+                            return null;
+                        },
+
+
+                        insertTemplate: function(value) {
+                            return null;
+                        },*/
+
+                    },
+
+                    {type: "control", deleteButton: false, editButton: true, visible: true, width: 70,}]
+            });
+        });
+
+
+    </script>
+{% endblock %}
+
+{#function editRow(rowId, rowIndex, columnIndex) {#}
+{#              var grid = $('#jsGridResidents');#}
+{#              grid.editRow(rowId, true, function() {#}
+{#                var colModel = grid.getGridParam('colMode');#}
+{#                var colName = colModel[colIndex].name;#}
+{#                var input = $('#' + rowId + '_' + colName);#}
+{#                input.get(0).focus();#}
+{#              });#}
+{#            }#}

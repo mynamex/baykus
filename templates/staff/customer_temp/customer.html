@@ -1,0 +1,315 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %} Tables {% endblock title %}
+
+{% block content %}
+
+    <!-- Header -->
+    <div class="header bg-primary pb-6">
+        <div class="container-fluid">
+            <div class="header-body">
+                <div class="row align-items-center py-4">
+
+                    <div class="col-lg-6 col-7">
+                        <h6 class="h2 text-white d-inline-block mb-0">Müşteri Detay</h6>
+                    </div>
+
+
+                    <div class="col-lg-6 col-5 text-right">
+                        {#                        <a href="#" class="btn btn-sm btn-neutral">Düzenle</a>#}
+                    </div>
+                </div>
+                <!-- Card stats -->
+
+
+                <div class="row">
+
+                    <div class="col-md-12">
+                        <div class="card card-stats">
+                            <!-- Card body -->
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Ayarlar</h5>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-gradient-red text-white rounded-circle shadow">
+                                            <i class="ni ni-settings-gear-65"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <nav aria-label="breadcrumb" class="d-md-inline-block">
+                                    <ol class="breadcrumb breadcrumb-link" style="background-color: #0c5460" >
+                                        <li class="breadcrumb-item"><a href="{% url 'staff_me:customer' customer.id %}"><i
+                                                class="fas fa-home"></i></a></li>
+                                        <li class="breadcrumb-item"><a href="{% url 'staff_me:customer_users' customer.id %}">Kullanıcılar</a>
+                                        </li>
+                                        <li class="breadcrumb-item"><a href="{% url 'staff_me:show_gates' customer.id %}">Kapılar</a>
+                                        </li>
+                                        <li class="breadcrumb-item"><a href="{% url 'staff_me:show_blocks' customer.id %}">Bloklar</a>
+                                        </li>
+                                        {#                                <li class="breadcrumb-item"><a href="#">Daireler</a></li>#}
+                                        {#                                <li class="breadcrumb-item active" aria-current="page">Detay</li>#}
+                                    </ol>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+
+
+
+
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card card-stats">
+                            <!-- Card body -->
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Kullanıcı Sayısı</h5>
+                                        <span class="h2 font-weight-bold mb-0 text-white">{{ user_count }}</span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-gradient-red text-white rounded-circle shadow">
+                                            <i class="ni ni-active-40"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="mt-3 mb-0 text-sm">
+                                    <span class="text-success mr-2"><i class="fa fa-arrow-up"></i></span>
+                                    <span class="text-nowrap " style="color:#8898aa">Erişim sahipleri </span>
+
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card card-stats">
+                            <!-- Card body -->
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Giriş Kapıları</h5>
+                                        <span class="h2 font-weight-bold mb-0 text-white">{{ gates_count }}</span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-gradient-orange text-white rounded-circle shadow">
+                                            <i class="ni ni-chart-pie-35"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="mt-3 mb-0 text-sm">
+                                    <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> </span>
+                                    <span class="text-nowrap"></span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card card-stats">
+                            <!-- Card body -->
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Blok</h5>
+                                        <span class="h2 font-weight-bold mb-0 text-white">{{ blocks_count }}</span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-gradient-green text-white rounded-circle shadow">
+                                            <i class="ni ni-money-coins"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="mt-3 mb-0 text-sm">
+                                    <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> </span>
+                                    <span class="text-nowrap"></span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card card-stats">
+                            <!-- Card body -->
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Daireler</h5>
+                                        <span class="h2 font-weight-bold mb-0 text-white">{{ daire_count }}</span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-gradient-info text-white rounded-circle shadow">
+                                            <i class="ni ni-chart-bar-32"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="mt-3 mb-0 text-sm">
+                                    <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> 3.48%</span>
+                                    <span class="text-nowrap" style="color:#8898aa">Doluluk oranı</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Page content -->
+    <div class="container-fluid mt--6">
+
+        {% if go_to == "customer_main" %}
+
+            <div class="row">
+                <div class="col-xl-8">
+                    <div class="card">
+                        <div class="card-header border-0">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h3 class="mb-0 text-white">Bilgiler</h3>
+                                </div>
+                                <div class="col text-right">
+
+                                    <ul class="nav nav-pills justify-content-end">
+                                        <a href="{% url 'staff_me:edit_customer_info' customer.id %}"
+                                           class="nav-link py-2 px-3">
+                                            <span class="d-none d-md-block">Düzenle</span>
+                                        </a>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <!-- Projects table -->
+                            <table class="table align-items-center table-flush">
+                                <thead class="thead-light">
+                                <tr>
+
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                <tr>
+                                    <th scope="row">
+                                        <span class="badge badge-dot mr-4">
+                                            <i class="bg-warning"></i>
+                                            <span class="status" style="color:#8898aa">Yetkili kişi</span>
+                                        </span>
+                                    </th>
+                                    <td>
+                                        <span class="name mb-0 text-capitalize"
+                                              style="color:#8898aa">   {{ customer.related_person_name }}</span>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <th scope="row">
+                                 <span class="badge badge-dot mr-4">
+                                <i class="bg-warning"></i>
+                                <span class="status" style="color:#8898aa">Vergi No</span>
+                                </span>
+                                    </th>
+
+                                    <td>
+                                        <span class="name mb-0 text-capitalize"
+                                              style="color:#8898aa">  {{ customer.tax_number }}</span>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <th scope="row">
+                                <span class="badge badge-dot mr-4">
+                                <i class="bg-warning"></i>
+                                <span class="status" style="color:#8898aa">Telefon</span>
+                                </span>
+                                    </th>
+                                    <td>
+                                        <span class="name mb-0 text-capitalize"
+                                              style="color:#8898aa">  {{ customer.site_phone1 }}</span>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <th scope="row">
+                               <span class="badge badge-dot mr-4">
+                                <i class="bg-warning"></i>
+                                <span class="status" style="color:#8898aa">   Lisans Tarihi</span>
+                                </span>
+                                    </th>
+                                    <td>
+                                        <span class="name mb-0 text-capitalize"
+                                              style="color:#8898aa">  {{ customer.licence_date }}</span>
+                                    </td>
+
+                                </tr>
+
+                                <tr>
+                                    <th scope="row">
+                                <span class="badge badge-dot mr-4">
+                                <i class="bg-warning"></i>
+                                <span class="status" style="color:#8898aa">Adres</span>
+                                </span>
+                                    </th>
+
+                                    <td>
+                                        <span class="name mb-0 text-capitalize"
+                                              style="color:#8898aa">   {{ customer.site_address }}</span>
+                                    </td>
+
+                                </tr>
+
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        {% elif go_to == "show_customer_users" %}
+            {% include 'staff/customer_temp/tables/table-users.html' %}
+        {% elif go_to == "show_gates" %}
+            {% include 'staff/customer_temp/tables/table-gates.html' %}
+        {% elif go_to == "show_blocks" %}
+            {% include 'staff/customer_temp/tables/table-blocks.html' %}
+            {#        {% elif go_to == "show_apartments" %}#}
+            {#             {% include 'staff/customer_temp/tables/table-daires.html' %}#}
+
+        {% endif %}
+
+        {#        {% include "includes/footer.html" %}#}
+    </div>
+
+{% endblock content %}
+
+{% block javascripts %}
+
+    <script type="text/javascript"> window.CSRF_TOKEN = "{{ csrf_token }}"; </script>
+
+    <script>
+        function showTable(clicked) {
+            $(".iptable").hide();
+            let id = clicked.id
+            id = id.replace('link', '');
+
+            document.getElementById(id).style.display = "block";
+        }
+
+    </script>
+
+    <script>
+        $('#show-block-in_daires').on('click', function () {
+
+            $('.form-wrapper').removeClass('hidden')
+        })
+
+    </script>
+
+
+{% endblock javascripts %}

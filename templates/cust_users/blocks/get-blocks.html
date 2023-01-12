@@ -1,0 +1,473 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{#{% block title %} Tables {% endblock title %}#}
+
+
+{% block content %}
+
+    <div class="header bg-primary pb-6">
+        <div class="container-fluid">
+            <div class="header-body">
+                <!-- Card stats -->
+                <div class="row">
+                    <div class="col-md-12 col-xl-12 col-sm-12 ">
+                        <div class="card card-stats">
+                            <!-- Card body -->
+                            <div class="card">
+                                <div class="col-md-8 p-2 ">
+                                    <div class="d-flex justify-content-around">
+                                        <div class="form-group col-md-4">
+                                            <h5 class="card-title text-capitalize text-muted mb-0">Bloklar</h5>
+                                            <select aria-label="Default select example" id="select_blocks"
+                                                    class="form-control">
+                                                <option value="">--seç--</option>
+                                                {% for d_block in d_blocks %}
+                                                    <option value="{{ d_block.id }}">{{ d_block.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-md-4">
+                                            <h5 class="card-title text-capitalize text-muted mb-0">Daireler</h5>
+                                            <select id="select_apartment" class="form-control">
+                                                <option value="">--seç--</option>
+                                            </select>
+                                        </div>
+                                       <div class="form-group col-md-4">
+                                             <div class="align-content-lg-end">
+                                            <h5 class="card-title text-capitalize text-muted mb-0">Detaylı arama</h5>
+                                            {% include 'cust_users/blocks/search.html' %}
+                                        </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="table-responsive" style="visibility: hidden" id="id_card_header_right">
+
+                                    <table class="table align-items-center" id="id_table_apartment_info">
+                                        <thead class="thead-light" style="background-color: #1c1c1c">
+                                        <tr>
+                                            <th scope="col" class="sort" data-sort="name">Tapu Yetkilisi</th>
+                                            <th scope="col" class="sort" data-sort="budget">Blok/Daire</th>
+                                            <th scope="col" class="sort" data-sort="status">Daire durumu</th>
+                                            <th scope="col" class="sort" data-sort="status">Kullanım</th>
+                                            <th scope="col" class="sort" data-sort="status">com</th>
+                                            <th scope="col"></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody class="list">
+
+                                        <tr>
+                                            <th scope="row">
+                                                <div class="media align-items-center">
+                                                    <a href="#" class="avatar rounded-circle mr-3" id="td_img"></a>
+                                                    <div class="media-body">
+                                                        <span id="id_owner_name" class="name mb-0 text-sm text-capitalize"></span>
+                                                    </div>
+                                                </div>
+                                            </th>
+
+                                            <td id="id_owner_phone" style="display:none;"></td>
+
+                                            <td id="t_block_ap_name" class="budget text-capitalize"></td>
+
+                                            <td>
+                                                    <span class="badge badge-dot mr-4">
+                                                      <i id="td_i_clor" class="bg-orange"></i>
+                                                      <span id="t_ap_status" class="status text-capitalize"></span>
+                                                    </span>
+                                            </td>
+
+                                            <td>
+                                                    <span class="badge badge-dot mr-4">
+                                                      <i class="bg-blue"></i>
+                                                      <span id="t_its_self" class="status text-capitalize"></span>
+                                                    </span>
+                                            </td>
+
+                                            <td class="budget text-capitalize">
+                                                <span id="t_intercom" class="status text-capitalize"></span>
+                                            </td>
+
+                                            <td class="text-right">
+                                                <div class="dropdown">
+                                                    <a class="btn btn-sm btn-icon-only text-light" href="#" role="button"
+                                                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        <i class="fas fa-ellipsis-v"></i>
+                                                    </a>
+                                                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                                                        <a id="id_bt_edit_owner" class="dropdown-item" data-toggle="modal"
+                                                           data-target="#id_modal_edit_owner">Tapu Sahibini Düzenle</a>
+                                                        <a id="id_bt_add_new_family" class="dropdown-item"
+                                                           style="visibility: hidden" href="#">Daire içine yeni kişi taşı</a>
+                                                    </div>
+                                                </div>
+
+                                            </td>
+
+                                        </tr>
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+                        </div>
+                        {% include 'cust_users/blocks/create_family.html' %}
+                        {% include 'cust_users/blocks/edit_owner.html' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    {#    ------------------------------------------------ Cart Bottom --------------------------------------------------#}
+
+    <div class="container-fluid mt--6 p-0"  style="visibility: hidden" id="id_card_bottom" >
+        <div class="card">
+            <div class="card-header card-header-icon">
+                <div class="card-icon">
+                    <i class="ni ni-building text-yellow"></i>
+                    <span class="nav-link-text text-white">Daire bilgileri</span>
+                </div>
+
+            </div>
+            <div class="card-body">
+
+                    <div class="row align-items-center">
+                        <div class="col-md-12">
+                            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="info-tab" data-toggle="tab"
+                                       href="#id_tab_info" role="tab" aria-controls="info"
+                                       aria-selected="false">Bilgiler</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link " id="residents-tab" data-toggle="tab"
+                                       href="#id_tap_residents" role="tab" aria-controls="home"
+                                       aria-selected="true">Daire Sakinleri</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="carplates-tab" data-toggle="tab"
+                                       href="#id_tab_carplates" role="tab" aria-controls="profile"
+                                       aria-selected="false">Araç Plakaları</a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link" id="note-tab" data-toggle="tab" href="#id_tab_note"
+                                       role="tab" aria-controls="contact" aria-selected="false">Not</a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link" id="del-tab" data-toggle="tab"
+                                       href="#id_tab_delete_family" role="tab" aria-controls="del"
+                                       aria-selected="false">Sil</a>
+                                </li>
+
+                            </ul>
+
+                        </div>
+                        <div class="col text-right">
+
+                        </div>
+                    </div>
+
+
+
+                    <div class="tab-content" id="myTabContent">
+
+                        {#   ------------------- İnfo------------------------                             #}
+                        <div class="tab-pane fade  show active " id="id_tab_info" role="tabpanel"  aria-labelledby="info-tab">
+                            <div class="table-responsive p-1">
+                                {% include 'cust_users/blocks/info.html' %}
+                            </div>
+                        </div>
+
+                        {#  ------------------  Daire Sakinleri -------------------------------------#}
+                        <div class="tab-pane fade" id="id_tap_residents" role="tabpanel"  aria-labelledby="residents-tab">
+                            <div class="table-responsive p-3">
+                                {% include 'cust_users/blocks/residents_list.html' %}
+                            </div>
+                        </div>
+
+                        {# ------------------   Plakalar ----------------------                            -#}
+                        <div class="tab-pane fade" id="id_tab_carplates" role="tabpanel"
+                             aria-labelledby="carplates-tab">
+                            <div class="table-responsive p-3">
+                                <div class="col px-md-0 ">
+                                    {% include 'cust_users/blocks/carplates_list.html' %}
+                                </div>
+                            </div>
+                        </div>
+
+                        {#   ------------------- Note------------------------                             #}
+                        <div class="tab-pane fade" id="id_tab_note" role="tabpanel" aria-labelledby="note-tab">
+                            {% include 'cust_users/blocks/note.html' %}
+                        </div>
+
+                        {#    ------------------ Sil ---------------------------                          #}
+                        <div class="tab-pane fade" id="id_tab_delete_family" role="tabpanel"
+                             aria-labelledby="del-tab">
+                            {% include 'cust_users/blocks/delete_family.html' %}
+                        </div>
+
+                    </div>
+                </div>
+
+
+
+        </div>
+    </div>
+
+
+
+
+{% endblock content %}
+
+{% block javascripts %}
+
+    <script src="{% static 'assets/js/my_js/os_scala.js' %}"></script>
+
+    <script>
+
+        {#-----------------------------------arka sil orayı--------------------------------------------------------#}
+
+        let is_owner_in_families = null;
+        let d_apartment_data = null;
+        let d_parent_data = [];
+        let g_parent_id = null;
+        let apartment_id = null;
+        let family_id = null;
+        let is_get_family = false;
+        let d_persons_data = null;
+        let d_carplates_data = null;
+        let d_owner_data = null
+        let note = null;
+
+        const regex_email = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+
+
+        function go_clear() {
+            is_owner_in_families = null;
+            d_apartment_data = null;
+            d_carplates_data = null;
+            d_persons_data = null
+            d_owner_data = null;
+            d_parent_data = null;
+            note = null;
+            is_get_family = null;
+            family_id = null
+            g_parent_id = null;
+        }
+
+
+        function change_color_to_orange(val) {
+            val.removeClass('bg-green')
+            val.addClass('bg-orange')
+
+        }
+
+        function change_color_to_green(val) {
+            val.removeClass('bg-orange')
+            val.addClass('bg-green')
+        }
+
+        function clear_complement() {
+
+            $("#id_owner_name").text("-");
+            $("#id_owner_phone").text("");
+            $("#id_intercom").text("-");
+            $("#id_is_owner").text("-");
+            $("#id_bt_edit_owner").css("visibility", "hidden");
+            $("#id_card_bottom").css("visibility", "hidden");
+            $("#id_card_header_right").css("visibility", "hidden");
+            $("#id_bt_add_new_family").css("visibility", "hidden");
+            $("#jsGridResidents").jsGrid("option", "data", []);
+            $("#jsGridPlates").jsGrid("option", "data", []);
+
+        }
+
+        function empty_apartment_to_do() {
+            $("#id_bt_add_new_family").css("visibility", "visible");
+            $("#id_card_bottom").css("visibility", "hidden");
+            change_color_to_green($("#td_i_clor"))
+            $("#t_ap_status").text("Daire Boş");
+            $("#id_parent_name").val("");
+            $("#id_parent_phone").val("");
+            $("#id_p_note").val("");
+            $("#id_is_owner").text("-");
+            $("#id_label_created_date").val("");
+            $("#id_label_updated_date").val("");
+
+
+            $("#jsGridResidents").jsGrid("option", "data", []);
+            $("#jsGridPlates").jsGrid("option", "data", []);
+
+        }
+
+
+        function get_apartment_info() {
+
+            if (apartment_id) {
+
+                $.ajax({
+                    type: 'GET',
+                    url: "{% url 'family_view' %}",
+                    data: {"apartment_id": apartment_id},
+                    success: function (response) {
+
+                        const {success} = response
+                        if (success) {
+
+                            const {data: {family_data, person_data, carplates_data, apartment_data}} = response;
+
+                            const {intercom_phone, apartment_status, ap_id, owner_data} = apartment_data;
+
+                            d_apartment_data = apartment_data
+                            d_persons_data = person_data;
+                            apartment_id = ap_id
+
+                            console.log(owner_data)
+                            if (owner_data) {
+                                d_owner_data = owner_data
+
+                                $("#id_owner_name").text(d_owner_data.name);
+                                $("#id_owner_phone").text(d_owner_data.phone);
+
+                                {#$('#t_owner').text(d_owner_data.name)#}
+                                $('#td_img').text(d_owner_data.name[0])
+
+                            } else {
+                                $("#id_owner_name").text("-");
+                                $("#id_owner_phone").text("-");
+                                $("#id_is_owner").text("Bilgiler yetersiz");
+                                {#$('#t_owner').text("-")#}
+                            }
+
+                            $("#id_intercom").text(intercom_phone);
+                            $("#t_intercom").text(intercom_phone);
+                            $("#id_bt_edit_owner").css("visibility", "visible");
+                            $("#id_card_header_right").css("visibility", "visible")
+
+                            const block_name = $("#select_blocks").children("option:selected").text()
+                            const ap_name = $("#select_apartment").children("option:selected").text()
+
+                            $("#id_label_info_block").text(block_name);
+                            $("#id_label_info_apartment").text(ap_name);
+
+                            $('#t_block_ap_name').text(block_name + "/" + ap_name)
+
+                            if (apartment_status) {
+                                {#-------------------------------------daire dolu ----------------------------#}
+                                d_parent_data = person_data.find(person => person.categories === "day")
+
+                                if (d_parent_data) {
+                                    $("#id_parent_name").val(d_parent_data.name);
+                                    $("#id_parent_phone").val(d_parent_data.phone);
+                                } else {
+                                    $("#id_parent_name").val("-");
+                                    $("#id_parent_phone").val("-");
+                                }
+
+                                change_color_to_orange($("#td_i_clor"))
+                                $("#t_ap_status").text("Daire Dolu");
+
+                                $("#id_bt_add_new_family").css("visibility", "hidden");
+
+                                if (family_data) {
+                                    if (d_owner_data) {
+                                        if (family_data["persons"].includes(d_owner_data.pk)) {
+                                            $("#id_is_owner").text("Kendisi");
+                                            $("#t_its_self").text("Kendisi");
+                                        } else {
+                                            $("#id_is_owner").text("Kiracı Oturuyor");
+                                            $("#t_its_self").text("Kiracı Oturuyor");
+                                        }
+                                    } else {
+                                        $("#id_is_owner").text("Bilgi alınamadı");
+                                        $("#t_its_self").text("Bilgi alınamadı");
+                                    }
+
+
+                                    $("#id_p_note").text(family_data.note)
+                                    $("#id_label_created_date").text(family_data.data_created)
+                                    $("#id_label_updated_date").text(family_data.last_update_date)
+
+                                    family_id = family_data.id
+                                    $("#id_card_bottom").css("visibility", "visible");
+
+                                    d_carplates_data = carplates_data;
+
+                                    $("#jsGridResidents").jsGrid("option", "data", person_data);
+                                    $("#jsGridPlates").jsGrid("option", "data", carplates_data);
+
+
+                                } else {
+                                    alert("burada yaşayan bir aile yok fakat daire dolu gözüküyor !")
+                                }
+
+                            } else {
+                                {#-------------------------------------daire bos -----------------------------#}
+                                empty_apartment_to_do()
+                            }
+                        } else {
+                            go_clear()
+                            const {data: {desc}} = response;
+                            alert(desc)
+                        }
+                    },
+                    error: function (response) {
+                        go_clear()
+                    }
+                })
+            } else {
+                go_clear()
+            }
+        }
+
+        $(function () {
+            {# blok seç#}
+            $("#select_blocks").change(function (e) {
+                e.preventDefault();
+
+                clear_complement();
+
+                let block_id = $(this).children("option:selected").val();
+                $("#select_apartment").empty().append('<option value = "">Seç</option>');
+
+                if (block_id) {
+                    $.ajax({
+                        type: 'GET',
+                        url: "{% url 'get_apartments' %}",
+                        data: {"block_id": block_id},
+                        success: function (response) {
+                            // if not valid user, alert the user
+                            if (response["success"]) {
+                                const select_apartment = $("#select_apartment");
+                                let options = '';
+                                const array = response.apartments.sort()
+                                array.forEach(ap => {
+                                    options += '<option value=' + ap.id + '>' + ap.name + '</option>';
+                                })
+                                select_apartment.append(options);
+                            } else MyToastWarn("blok eşleşmedi");
+                        },
+                        error: function (response) {
+                            MyToastError(response)
+                        }
+                    })
+                } else console.log("seçiniz")
+            });
+            {# daire seç#}
+            $("#select_apartment").change(function (e) {
+                e.preventDefault();
+                family_id = null;
+                is_get_family = null;
+                apartment_id = $("#select_apartment").children("option:selected").val();
+                get_apartment_info()
+            });
+        });
+    </script>
+{% endblock %}
+

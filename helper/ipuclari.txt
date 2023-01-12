@@ -1,0 +1,22 @@
+
+
+
+
+
+#host ip si
+hostname -I
+
+# güvenlik durumu
+sudo ufw status
+
+
+
+# port listesi
+netstat -ntlp
+
+# 8000 portu kill yap
+sudo lsof -t -i tcp:8000 | xargs kill -9
+
+
+# python3 yükselt
+sudo apt-get install python3.8-dev

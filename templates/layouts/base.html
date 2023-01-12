@@ -1,0 +1,100 @@
+{% load static %}
+<!--
+=========================================================
+* Dashboard - v1.2.0
+=========================================================
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="canonical" href="https://appseed.us/admin-dashboards/django-dashboard-argon">
+
+    <title>
+
+        Baykuş - Kontrol | Sistemleri
+    </title>
+
+    <!-- Favicon - loaded as static -->
+    <link rel="icon" href="/static/assets/img/brand/favicon.png" type="image/png">
+    <!-- Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700">
+    <!-- Icons -->
+    <link rel="stylesheet" href="/static/assets/vendor/nucleo/css/nucleo.css" type="text/css">
+    <link rel="stylesheet" href="/static/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css" type="text/css">
+    <!-- Page plugins -->
+    <!-- Argon CSS -->
+    <link rel="stylesheet" href="/static/assets/css/argon.css?v=1.2.0" type="text/css">
+    <link rel="stylesheet" href="/static/assets/css/spinner.css" type="text/css">
+
+    <!-- Specific CSS goes HERE -->
+    {% block stylesheets %}{% endblock stylesheets %}
+
+    <!-- jquery table -->
+    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.css" />
+    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid-theme.min.css" />
+
+    <link rel="stylesheet" href="{% static 'assets/css/jquery.toast.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/my_jsgridcss.css' %}">
+
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8= sha256-T+aPohYXbm0fRYDpJLr+zJ9RmYTswGsahAoIsNiMld4=" crossorigin="anonymous"></script>
+
+</head>
+
+<body class="">
+
+ {% include "includes/../cust_users/../cust_users/cust-sidenav.html" %}
+
+<div class="main-content" id="panel">
+    {% include "includes/../includes/navigation.html" %}
+    {% block content %}{% endblock content %}
+</div>
+
+
+<div class="bg-spinner" id="bg-spinner">
+    <div class="position-spinner" id="position-spinner">
+        <span class="spinner" id="spinner">
+        </span>
+    </div>
+</div>
+
+{% for message in messages  %}
+    {% if message.tags == 'success' %}
+         <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8= sha256-T+aPohYXbm0fRYDpJLr+zJ9RmYTswGsahAoIsNiMld4=" crossorigin="anonymous"></script>
+         <script src="{% static 'assets/js/jquery.toast.js' %}"></script>
+        <script>
+            let myToast = $.toast({
+                heading: 'Can I add <em>icons</em>?',
+                text: 'Yes! check t .',
+                hideAfter: false,
+                icon: 'success',
+                position:"top-right"
+            })
+        </script>
+
+    {% endif %}
+
+{% endfor %}
+
+
+
+
+{% include "includes/../includes/scripts.html" %}
+
+<!-- Specific JS goes HERE -->
+{% block javascripts %}
+{% endblock javascripts %}
+
+<script src="/static/assets/js/argon.js?v=1.2.0"></script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.js"></script>
+<script src="{% static 'main.js' %}"></script>
+
+ <script src="{% static 'assets/js/jquery.toast.js' %}"></script>
+
+</body>
+
+</html>

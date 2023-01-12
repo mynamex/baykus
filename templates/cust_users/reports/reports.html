@@ -1,0 +1,419 @@
+{% extends 'layouts/base.html' %}
+
+
+{% block content %}
+
+    <!-- Header -->
+    <div class="header bg-primary pb-5">
+        <div class="container-fluid">
+            <div class="header-body">
+                {#                <div class="row align-items-center py-4">#}
+                {#                    <div class="col-lg-6 col-7">#}
+                {#                    </div>#}
+                {#                    <div class="col-lg-6 col-5 text-right">#}
+                {#                        <p>"hellos</p>#}
+                {#                    </div>#}
+                {#                </div>#}
+                <!-- Card stats -->
+                <div class="row">
+                    <div class="col-md-12 col-xl-12 col-sm-12">
+                        <div class="card card-stats">
+                            <!-- Card body -->
+
+                            <div class="card-body">
+                                <!-- header -->
+                                <div class="row">
+                                    <div class="col">
+                                        <label for="labelBlok" class="text-white">Raporlama</label>
+                                        {#                                        <h5 class="card-title text-uppercase text-muted mb-0">Raporlama</h5>#}
+                                        <span class="h2 font-weight-bold mb-0"></span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-gradient-orange text-white rounded-circle shadow">
+                                            <i class="ni ni-chart-pie-35"></i>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="row">
+
+
+                                    <!-- Blok -->
+                                    <div class="form-group col-md-3 col-xs-12">
+                                        <h5 class="card-title text-capitalize text-muted mb-0">Bloklar</h5>
+                                        <select aria-label="Default select example" id="select_blocks"  class="form-control" >
+                                            <option value="">--seç--</option>
+                                            {% for d_block in d_blocks %}
+                                                <option value="{{ d_block.id }}">{{ d_block.name }}</option>
+                                            {% endfor %}
+                                        </select>
+
+                                    </div>
+                                    <!-- daireler -->
+                                    <div class="form-group col-md-3 col-xs-12">
+                                        <h5 class="card-title text-capitalize text-muted mb-0">Daireler</h5>
+                                        <label for="select_apartment" hidden></label>
+                                        <select id="select_apartment" class="form-control">
+                                            <option value="">--seç--</option>
+                                        </select>
+                                    </div>
+                                    <!-- Date  -->
+                                    <div class="form-group col-md-3 col-xs-12">
+                                        <h5 class="card-title text-capitalize text-muted mb-0">Başlangıç</h5>
+
+
+                                        <label>
+                                            <input id="id_start_date" class="form-control" placeholder="start"
+                                                   type="datetime-local" value="">
+                                        </label>
+
+                                    </div>
+
+                                    <div class="form-group col-md-3 col-xs-12">
+                                        <h5 class="card-title text-capitalize text-muted mb-0">Bitiş</h5>
+
+                                        {#                                        <div class="input-group input-group-alternative">#}
+                                        <label>
+                                            <input id="id_end_date" class="form-control" placeholder="end"
+                                                   type="datetime-local"
+                                                   value="">
+                                        </label>
+                                        {#                                        </div>#}
+                                    </div>
+
+                                    <!-- filter 1 -->
+                                    <div class="form-group col-md-2">
+                                        <h5 class="card-title text-capitalize text-muted mb-0">Ziyaretçi Filtresi</h5>
+                                        <input type="checkbox" id="id_check_filter1" data-target="#collapseFilter"
+                                               data-toggle="collapse" aria-label="Checkbox for following text input">
+
+                                    </div>
+
+                                    <div class="collapse" id="collapseFilter">
+                                        <div class="card card-body">
+                                            <div class="row ">
+
+                                                <!-- visitor name  -->
+                                                <div class="form-group col-md-3">
+                                                    <h5 class="card-title text-capitalize text-muted mb-0">Ziyaretçi
+                                                        Adı</h5>
+                                                    <div class="input-group">
+                                                        <label for="id_input_visitor_name"></label>
+                                                        <input id="id_input_visitor_name" maxlength="40" min="4" type="text"
+                                                               class="form-control text-capitalize text" placeholder="">
+                                                    </div>
+                                                </div>
+
+                                                <!-- visitor car  -->
+                                                <div class="form-group col-md-3">
+                                                    <h5 class="card-title text-capitalize text-muted mb-0">Araç Plakası</h5>
+                                                    <div class="input-group">
+                                                        <label for="id_input_visitor_plate"></label>
+                                                        <input id="id_input_visitor_plate" type="text" maxlength="8" min="4"
+                                                               class="form-control text-uppercase" placeholder="">
+                                                    </div>
+                                                </div>
+
+
+                                                <!-- visitor reason  -->
+                                                <div class="form-group col-md-3">
+                                                    <h5 class="card-title text-capitalize text-muted mb-0">Geliş Sebebi</h5>
+
+                                                    <div class="input-group">
+                                                        <select aria-label="Default select example" id="id_select_reason"
+                                                                class="form-control">
+                                                            <option value="">--seç--</option>
+                                                            {% for ans in d_reason_visit %}
+                                                                <option value="{{ ans.id }}">{{ ans.reason_name }}</option>
+                                                            {% endfor %}
+                                                        </select>
+
+                                                    </div>
+                                                </div>
+
+                                                <!-- visitor answer  -->
+                                                <div class="form-group col-md-3">
+                                                    <h5 class="card-title text-capitalize text-muted mb-0">Verilen
+                                                        cevap</h5>
+                                                    <div class="input-group">
+                                                        <select aria-label="Default select example" id="id_select_answer"
+                                                                class="form-control">
+                                                            <option value="">--seç--</option>
+                                                            {% for ans in d_answers %}
+                                                                <option value="{{ ans.id }}">{{ ans.answer_name }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <!-- Button  -->
+                                    <div class="form-group col-md-3 col-xs-6">
+                                        <h5 class="card-title text-capitalize text-muted mb-0"></h5>
+                                        <label>
+                                            <a href="javascript:go_ask();" class="btn btn-secondary btn-lg active "
+                                               role="button" aria-pressed="true">Sorgula</a>
+                                        </label>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div class="container-fluid mt--6 p-2"  style="visibility: hidden" id="id_bottom_container">
+        <div class="card">
+            <div class="card-header card-header-icon">
+                <div class="card-icon">
+                    <i class="ni-bullet-list-67 text-yellow"></i>
+                    <span class="nav-link-text text-gray" id="id_report">Raporlama</span>
+                </div>
+
+            </div>
+            <div class="card-body">
+
+                {% include 'cust_users/reports/table-reports.html' %}
+
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock content %}
+
+
+{% block javascripts %}
+
+    <script type="text/javascript">
+
+        var report_js = {
+            init:function (){
+            },
+            values: {
+                filter :{
+                    block_id: null,
+                    apartment_id: null,
+
+                    start_date:  null,
+                    end_date:  null,
+                    is_visitor_filter:  null,
+                    visitor_data:  null,
+
+                    first_count:  null,
+                    last_count:  null,
+
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                }
+            }
+        }
+
+        $(function(){
+            report_js.init();
+        });
+
+        function go_ask() {
+            $('#id_table_list tbody').empty();
+            let block = $("#select_blocks")
+            let apartment = $("#select_apartment")
+
+            let start_date = $("#id_start_date");
+            let end_date = $("#id_end_date");
+
+            const block_id = block.children("option:selected").val();
+            const apartment_id = apartment.children("option:selected").val();
+
+            const query_data ={}
+
+            {#go_valid(block)#}
+            {#go_valid(apartment)#}
+
+            if ($("#id_check_filter1").is(':checked')) {
+
+                if ($("#id_input_visitor_name").val())
+                    if ($("#id_input_visitor_name").val().length < 3) {
+                        MyToastWarn("Dikkat ziyaretçi adı en az 4 harfden oluşur")
+                        return;
+                    }
+
+                if ($("#id_input_visitor_plate").val()) {
+                    if ($("#id_input_visitor_plate").val().length < 4) {
+                        MyToastWarn("Dikkat ziyaretçi plakası en az 5 harfden oluşur")
+                        return;
+                    }
+                }
+            }else{
+
+                if (!block_id) {
+                    go_invalid(block)
+                    return
+                }
+
+                if (!apartment_id) {
+                    go_invalid(apartment)
+                    return
+                }
+
+
+
+                if (!start_date.val()) {
+                    MyToastWarn("Başlangıç zamanı gerekli")
+                    return
+                }
+
+
+                if (!end_date.val()) {
+                    MyToastWarn("Bitiş zamanı gerekli")
+                    return
+                }
+
+                if (start_date.val() > end_date.val()) {
+                    MyToastWarn("başlangıç zamanı bitiş zamanından sonra olmaz")
+                    return
+                }
+            }
+
+            report_js.values.filter.is_visitor_filter = $("#id_check_filter1").is(':checked')
+            {#report_js.values.filter.block_id = block_id#}
+            {#report_js.values.filter.apartment_id = apartment_id#}
+            report_js.values.filter.start_date = start_date.val()
+            report_js.values.filter.end_date = end_date.val()
+
+            query_data["apartment_id"] =apartment_id
+            query_data["visitor_name"] =$("#id_input_visitor_name").val()
+            query_data["visitor_car_plate"] =$("#id_input_visitor_plate").val()
+            query_data["reason_for_visit_id"] =$("#id_select_reason").children("option:selected").val()
+            query_data["reason_answer_id"] =$("#id_select_answer").children("option:selected").val()
+
+
+            report_js.values.filter.visitor_data = JSON.stringify(query_data)
+
+            $("#jsGridReports").jsGrid('option','pageIndex',1);
+            $("#jsGridReports").jsGrid("loadData")
+
+        }
+
+        $("#id_start_date").on("change", function () {
+            const start_date = $(this).val();
+            const today = new Date().toISOString().slice(0, new Date().toISOString().lastIndexOf(":"));
+
+            $('#id_end_date').val(("mm/dd/yyyy --:-- --"));
+            $('#id_end_date').attr("min", start_date).attr("max", today)
+
+        });
+
+        $("#id_input_visitor_name").on("change", function () {
+            const name = $(this).val();
+
+            if (name) {
+                if (name.length > 4) {
+                    go_valid($(this))
+                } else {
+                    go_invalid($(this))
+                }
+            } else {
+                go_valid($(this))
+            }
+        });
+
+        $("#id_input_visitor_plate").on("change", function () {
+            const name = $(this).val();
+            if (name) {
+                if (name.length > 4) {
+                    go_valid($(this))
+                } else {
+                    go_invalid($(this))
+                }
+            } else {
+                go_valid($(this))
+            }
+        });
+
+
+
+        $(function () {
+
+            const today = new Date().toISOString().slice(0, new Date().toISOString().lastIndexOf(":"));
+            const st = new Date();
+
+            st.setDate(st.getDate() - 20);
+            $('#id_start_date').attr("min", "2022-01-14T21:56").attr("max", today)
+            $('#id_start_date').attr("value", st.toJSON().slice(0, st.toISOString().lastIndexOf(":")))
+
+
+            $('#id_end_date').attr("min", "2022-01-14T21:56").attr("max", today)
+            $('#id_end_date').attr("value", today)
+
+            {# blok seç#}
+            $("#select_blocks").change(function (e) {
+                e.preventDefault();
+
+                let block_id = $(this).children("option:selected").val();
+                $("#select_apartment").empty().append('<option value = "">Seç</option>');
+                go_valid($(this))
+
+                if (block_id) {
+                    $.ajax({
+                        type: 'GET',
+                        url: "{% url 'get_apartments' %}",
+                        data: {"block_id": block_id},
+                        success: function (response) {
+                            // if not valid user, alert the user
+                            if (response["success"]) {
+                                const select_apartment = $("#select_apartment");
+                                let options = '';
+                                response.apartments.forEach(ap => {
+                                    options += '<option value=' + ap.id + '>' + ap.name + '</option>';
+                                })
+                                select_apartment.append(options);
+                            } else MyToastWarn("blok eşleşmedi");
+                        },
+                        error: function (response) {
+                            MyToastError(response)
+                        }
+                    })
+                } else MyToastWarn("seçiniz")
+            });
+
+            {# daire seç#}
+            $("#select_apartment").change(function (e) {
+                e.preventDefault();
+                {#const apartment_id = $(this).children("option:selected").val();#}
+                {#console.log($(this).children("option:selected").text())#}
+
+                if ($(this).children("option:selected").text() !== "Seç") {
+                    go_valid($(this))
+                } else {
+                    go_invalid($(this))
+                }
+            });
+        });
+
+
+        function go_valid(val) {
+            val.removeClass('is-invalid')
+            val.addClass('is-valid')
+        }
+
+        function go_invalid(val) {
+            val.removeClass('is-valid')
+            val.addClass('is-invalid')
+        }
+
+
+    </script>
+{% endblock %}
+

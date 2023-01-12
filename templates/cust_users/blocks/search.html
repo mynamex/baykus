@@ -1,0 +1,298 @@
+
+
+{#<input type="hidden" name="model_name" value="{{view.class_name}}" id="model_name">#}
+{#<input type="text" name="search_data" id="search_data" class=" search_data form-control pl-4" placeholder="Search..." value="{{search_key}}">#}
+
+
+ <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdown_coins"  data-target="#id_modal_search_family" style="background-color: #626177;color: whitesmoke" data-toggle="modal" aria-haspopup="true" aria-expanded="false">
+        Liste
+    </button>
+
+<div class="modal fade" id="id_modal_search_family"   tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="container  px-2 py-4" >
+                    <div class="row justify-content-between" >
+                        <div class="col-4">
+                            <h5 class="modal-title" id="exampleModalLabel">Bu sitede oturan tüm kişiler</h5>
+                        </div>
+                        <div class="d-flex flex-row-reverse">
+                            <div class="col-4">
+                                <div class="flex-row-reverse">
+                                    <button type="button"   class="btn btn-outline-light" data-dismiss="modal">x</button>
+                                </div>
+                            </div>
+
+                            <div class="col-8">
+                                <div class="d-flex flex-row-reverse">
+                                    <button type="button" onclick="clear_filter()" class="btn btn-outline-light">Temizle</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-body">
+                <div class="d-flex justify-content-center" id="id_div_loading">
+                    <div class="spinner-border" role="status">
+                        <span>Loading...</span>
+                    </div>
+                </div>
+
+                <div id="jsGridSearch" style="visibility: hidden">  </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+{% block javascripts %}
+
+    <script>
+
+        {# $('#id_modal_delete_family').on('hidden.bs.modal', function (e) {#}
+        {#    $('#id_checkbox_confirm_delete').prop('checked', false);#}
+        {#    $("#id_checkbox_confirm_delete_feed_back").css("visibility", "hidden");#}
+
+        let d_blocks_data = []
+        $('#select_blocks').children("option").each(function(index, element) {
+            d_blocks_data.push({block: element.text, "pk": element.val})
+        })
+
+        let f_search_data = false
+        let d_filter_data = null
+
+
+
+
+
+        {#$('#id_input_searchResidents').keyup(function(){#}
+        {#    let search_key = $.trim($(this).val());#}
+        {##}
+        {#    console.log(p_search_data)#}
+        {#    $("#id_tbody_residentsItems").empty()#}
+        {#    if (p_search_data){#}
+        {#    }#}
+        {##}
+
+        {##}
+        {#        var db = {#}
+        {#            loadData: function(filter) {#}
+        {#                return $.grep(this.clients, function(client) {#}
+        {#                    return (!filter.Name || client.Name.indexOf(filter.Name) > -1)#}
+        {#                        && (!filter.Age || client.Age === filter.Age)#}
+        {#                        && (!filter.Address || client.Address.indexOf(filter.Address) > -1)#}
+        {#                        && (!filter.Country || client.Country === filter.Country)#}
+        {#                        && (filter.Married === undefined || client.Married === filter.Married);#}
+        {#                });#}
+        {#            },#}
+        {#        };#}
+
+
+        function clear_filter(){
+            $("#jsGridSearch").jsGrid("clearFilter").done(function() {
+                console.log("filtering completed");
+            });
+        }
+
+        $(function () {
+
+
+            $('#id_modal_search_family').on('hidden.bs.modal', function (e) {
+
+                {#$(this)#}
+                {#    .find("input,textarea,select")#}
+                {#    .val('')#}
+                {#    .end()#}
+                {#    .find("input[type=checkbox], input[type=radio]")#}
+                {#    .prop("checked", "")#}
+                {#    .end();#}
+            })
+
+
+            $('#id_modal_search_family').on('show.bs.modal', function () {
+                $('#id_input_searchResidents').trigger('focus')
+                if (f_search_data){
+                    $("#id_div_loading").css("visibility", "hidden")
+
+                }else{
+                    $("#jsGridSearch").jsGrid("option", "data", []);
+                    $.ajax({
+                        type: 'GET',
+                        url: "{% url 'get_families_list' %}",
+
+                        success: function (response) {
+                            const {success}=response
+                            const my_keys = [ "apartment_id", "block_id", "block", "apartment", "persons__name"]
+                            if (success) {
+                                const{d_filtered_persons}=response
+                                if (d_filtered_persons){
+
+                                    let add_array=[]
+                                    d_filtered_persons.forEach(obj => {
+
+                                        const json = {};
+                                        Object.entries(obj).forEach(([key, value]) => {
+
+                                            {#console.log(`${key} ${value}`);#}
+                                            json[my_keys[key]] = value || "";
+                                        });
+                                        add_array.push(json)
+                                    })
+
+                                    $("#jsGridSearch").css("visibility", "visible")
+                                    $("#jsGridSearch").jsGrid("option", "data", add_array);
+                                    $("#id_div_loading").css("visibility", "hidden")
+                                    f_search_data = true;
+                                    d_filter_data = add_array
+
+
+                                }else {
+                                    f_search_data = false;
+                                    $("#id_div_loading").text("data bulunumadı")
+                                    $("#jsGridSearch").jsGrid("option", "data", []);
+
+                                }
+                            } else {
+                                const {data:{desc}}=response
+                                MyToastWarn(desc)
+                            }
+                        },
+                        error: function (response) {
+                            MyToastError(response)
+                        }
+                    })
+                }
+            })
+
+            {#------------------------------------------- Search list---------------------------------------------------------- #}
+            $("#jsGridSearch").jsGrid({
+                width: "100%",
+                height: "590px",
+
+                inserting: false,
+                filtering: true,
+                selecting: true,
+                editing: false,
+                sorting: true,
+                autoload: false,
+                loadMessage: "Lütfen bekleyin...",
+                invalidMessage: "Hatalı Data Girişi!",
+                paging: true,
+                pageSize: 11,
+                pageButtonCount: 5,
+                pagePrevText: "<",
+                pageNextText: ">",
+                pageFirstText: "<<",
+                pageLastText: ">>",
+                pagerFormat: "Sayfalar: {first} {prev} {pages} {next} {last}    {pageIndex} de {pageCount}",
+
+
+                controller: {
+                    loadData: function (filter) {
+                        return $.grep(d_filter_data, function (item, idx) {
+
+                            return (filter.persons__name === undefined ||
+                                    filter.persons__name === item.persons__name ||
+                                    item.persons__name.search(filter.persons__name) > -1 ||
+                                    item.persons__name.toLowerCase().indexOf(filter.persons__name) !== -1)
+                                && (filter.block === "--seç--" || item.block === filter.block) && (!filter.apartment || item.apartment === filter.apartment);
+                        });
+                    },
+                    insertItem: null
+                },
+                rowClick: function (args) {
+
+
+                    is_get_family = true;
+                    apartment_id = args.item.apartment_id;
+
+                    {#const tat = $('select[name=selector] option').filter("5.b 1.ac").text()#}
+
+                    {#$("#select_blocks option").map(e => {#}
+                    {##}
+                    {#     if ($("#select_blocks").val(e).text() ===  args.item.block ){#}
+                    {#         console.log("girdik içeri")#}
+                    {#         $("#select_blocks").val(e);#}
+                    {#     }#}
+                    {#    }#}
+                    {#)#}
+                    {# #}
+                    {# console.log(args.item.apartment)#}
+                    {# console.log(args.item.block_id)#}
+
+                    $("#select_blocks").val(args.item.block_id)
+
+
+                    const select_apartment = $("#select_apartment");
+                    let options = '';
+                    options += '<option value=' + args.item.apartment_id + '>' + args.item.apartment + '</option>';
+                    select_apartment.append(options);
+
+                    $("#select_apartment").val(args.item.apartment_id)
+
+                    get_apartment_info();
+
+                    $('#id_modal_search_family').modal('hide')
+                },
+                fields: [
+                    {name: "apartment_id", title: "Id", type: "number", width: 10, visible: false},
+                    {name: "block_id", title: "Id", type: "number", width: 10, visible: false},
+
+                    {#{name: "block_id", title: "Id", type: "number", width: 10,  visible: false},#}
+
+                    { name: "block", width: 100 , title: "block", type: "select",  selectedIndex: 0,
+                        items: d_blocks_data,
+                        autosearch: true,
+                        textField: "block",
+                        valueField: "block",
+                        valueType: "number|string", // the data type of the value
+                        align: "center",
+                    },
+
+                    {name: "apartment", title: "daire", type: "text", width: 100},
+                    /* {  name: "img",
+                         title: "img",
+                         itemTemplate: function (val, item) {
+                             if (val !== "picture" || !val)
+                                 return $("<img>").attr("src", val).css({height: 40, width: 40}).on("click", function () {
+                                     $("#imagePreview").attr("src", item.Img);
+                                     $("#dialog").dialog("open");
+                                 });
+                         },
+                         insertTemplate: function () {
+                             return insertControl = this.insertControl = $("<input>").prop("type", "file");
+                             // return insertControl;
+                         },
+                         insertValue: function () {
+{#return this.insertControl[0].files[0];#}
+                        },
+                        align: "center",
+                        width: 2,
+
+                    },*/
+                    {name: "persons__name", title: "isim", type: "text", width: 150},
+                    {#{name: "persons_id", title: "durum", type: "checkbox", width: 10, filtering: false, },#}
+
+                    {#{ type: "control" }#}
+
+                    {#{name: "plate", title: "Daire sakinleri", type: "text", width: 50,  validate: function(value, item) {  return value.length < 8 }},#}
+                    {type: "control", deleteButton: false, filtering: false, editButton: false, visible: false,  width: 3,}
+                ]
+            });
+
+        });
+
+    </script>
+
+
+{% endblock javascripts %}
