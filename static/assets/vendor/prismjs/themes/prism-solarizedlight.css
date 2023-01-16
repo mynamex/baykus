@@ -74,7 +74,7 @@ pre[class*="language-"] {
 	background-color: #fdf6e3; /* base3 */
 }
 
-/* Inline code */
+/* Inline core */
 :not(pre) > code[class*="language-"] {
 	padding: .1em;
 	border-radius: .3em;

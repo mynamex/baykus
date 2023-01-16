@@ -24,9 +24,11 @@ $(document).ajaxSend(function(){
 $(document).ajaxComplete(function(){
     $("#bg-spinner").fadeOut(250);
 });
-        $(document).ajaxError(function (event, jqXHR, ajaxSettings, thrownError) {
-            toastr.error("ERROR", "<li>" + thrownError + "</li>");
-        });
+    $(document).ajaxError(function (event, jqXHR, ajaxSettings, thrownError) {
+        // toastr.error("ERROR", "<li>" + thrownError + "</li>");
+          $("#bg-spinner").fadeOut(250);
+
+    });
 
 })
 

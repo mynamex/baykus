@@ -1,4 +1,4 @@
-// Inline code
+// Inline core
 code {
   @include font-size($code-font-size);
   color: $code-color;
@@ -27,13 +27,13 @@ kbd {
   }
 }
 
-// Blocks of code
+// Blocks of core
 pre {
   display: block;
   @include font-size($code-font-size);
   color: $pre-color;
 
-  // Account for some code outputs that place code tags in pre tags
+  // Account for some core outputs that place core tags in pre tags
   code {
     @include font-size(inherit);
     color: inherit;
@@ -41,7 +41,7 @@ pre {
   }
 }
 
-// Enable scrollable blocks of code
+// Enable scrollable blocks of core
 .pre-scrollable {
   max-height: $pre-scrollable-max-height;
   overflow-y: scroll;

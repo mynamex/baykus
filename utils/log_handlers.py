@@ -1,6 +1,6 @@
 import logging
 
-from apps.staff.models import Log
+from apps.home.models import Log
 
 
 class LoggingHandler(logging.Handler):

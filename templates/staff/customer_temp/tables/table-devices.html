@@ -1,11 +1,10 @@
-
 <div class="row">
-    <div class="col-xl-12">
+    <div class="col-xl-6">
         <div class="card">
             <div class="card-header border-0">
                 <div class="row align-items-center">
                     <div class="col">
-                        <h3 class="mb-0">Kullanıcılar</h3>
+                        <h3 class="mb-0 text-white" id="id_label_ap_name">Cihazlarım</h3>
                     </div>
                     <div class="col text-right">
 
@@ -14,8 +13,30 @@
             </div>
             <div class="table-responsive">
                 <!-- Projects table -->
-                <div class="col">
-                    <div id="jsGridUsers"></div>
+                <div class="col" id="devicesContainer" style=" visibility: hidden">
+                    <div id="jsGridDevices"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-6">
+        <div class="card">
+            <div class="card-header border-0">
+                <div class="row align-items-center">
+
+                    <div class="col text-right">
+
+                         <h3 class="mb-0" id="id_label_device_name">Röleler</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <!-- Projects table -->
+                <div class="col" id="roleContainer" style=" visibility: hidden">
+                     {% include 'staff/customer_temp/tables/table-roles.html' %}
+                    <div id="jsGridRoles"></div>
                 </div>
 
             </div>
@@ -25,63 +46,61 @@
 
 
 
-{% block custom_js %}
-    <script>
 
+
+
+{% block javascripts %}
+
+    <script>
         $(document).ready(function () {
-            $("#jsGridUsers").jsGrid({
+
+          $("#jsGridDevices").jsGrid({
                 width: "100%",
-                height: "370px",
+                height: "250px",
                 inserting: true,
                 {#filtering: true,#}
                 selecting: true,
                 editing: true,
                 sorting: true,
-                autoload: true,
+                autoload: false,
                 paging: true,
                 controller: {
                     loadData: function () {
                         let d = $.Deferred();
                         $.ajax({
                             method: 'GET',
-                            url:"{% url 'staff_me:cust_users_view' %}",
+                            url:"{% url 'devices_view' %}",
                             dataType: "json",
                             data: {
-                                "account_id": {{ customer.pk }},
+                                "ap_id":ap_id,
                                 "csrfmiddlewaretoken": '{{ csrf_token }}'
                             },
                         }).done(function (response) {
-                            {#console.log(response)#}
-                            d.resolve(response.d_users);
+                            d.resolve(response.d_data);
                         });
 
                         return d.promise();
                     }
                 },
-                onItemDeleting: function (args) {
-                    console.log(args);
-                    console.log("silmek istediğiniz kullanıcının durumunu pasif yapınız");
-                },
+
                 onItemInserting: function (args) {
+
                     $.ajax({
                         method: 'POST', dataType: "json", async:false,
-                        url:"{% url 'staff_me:cust_users_view' %}",
+                        url:"{% url 'devices_view' %}",
 
                         data: {
                             "in_go":"create",
-                            "account_id": {{ customer.pk }},
+                            "ap_id":ap_id,
                             "name": args.item.name,
-                            "username": args.item.username,
-                            "password": args.item.password,
-                            "is_person": args.item.is_person,
-                            "is_active": args.item.is_active,
                             "csrfmiddlewaretoken": '{{ csrf_token }}'
                         },
                     }).done(function (response) {
                         if (response.result) {
-                            const {new_user_id}=response
-                            args.item.id = new_user_id
-                            MyToastSuccess("Kullanıcı Kaydedildi")
+                            const {new_devices_id}=response
+                            args.item.id = new_devices_id
+                             args.item.is_active = true;
+                            MyToastSuccess("Cihaz Kaydedildi")
 
                             $(".jsgrid-insert-mode-button").click()
                         } else {
@@ -94,17 +113,15 @@
                 onItemUpdating: function (args) {
                     $.ajax({
                         method: 'POST',
-                        url: "/staff/cust_users_view/",
+                        url:"{% url 'devices_view' %}",
                         dataType: "json",
                           async:false,
                         data: {
                             "in_go":"update",
-                            "account_id": {{ customer.pk }},
-                            "user_id": args.item.id,
+                            "ap_id":ap_id,
+                            "dev_id": args.item.id,
                             "name": args.item.name,
-                            "username": args.item.username,
-                            "password": args.item.password,
-                            "is_person": args.item.is_person,
+                            "address": args.item.address,
                             "is_active": args.item.is_active,
                             "csrfmiddlewaretoken": '{{ csrf_token }}'
 
@@ -122,19 +139,25 @@
                 },
                 rowClick: function (args) {
                     {#console.log(args.item.id);#}
+                        $("#roleContainer").css('visibility', 'visible');
+                        device_id = args.item.id
+
+                         $("#id_label_device_name").text("Role : "+args.item.name);
+                          $("#jsGridRoles").jsGrid("loadData");
+
                 },
                 fields: [
-                    {name: "id", title: "Id", type: "number", width: 10, visible: false, validate: "required"},
-                    {name: "name", title: "İsim", type: "text", width: 50, validate: "required"},
-                    {name: "username", title: "Kullanıcı Adı", type: "text", width: 50, validate: "required"},
-                    {name: "password", title: "Parola", type: "text", width: 50},
-                    {name: "is_person", title: "Yetkili", type: "checkbox", width: 30},
-                    {name: "is_active", title: "Durum", type: "checkbox", width: 30},
+                    {name: "id", title: "Id", type: "number", width: 10, visible: false},
+                    {name: "name", title: "İsim", type: "text", width: 50,
+                      validate: function(value, item) {
+                        return item.name.length < 50 && item.name.length > 2 }},
+                    {name: "is_active", title: "Durum", type: "checkbox", width: 30, inserting: false},
+                         {#{name: "api_key", title: "Key", type: "text", width: 30, inserting: false,  editing: false},#}
                     {type: "control", deleteButton: false}]
             });
         });
     </script>
 
 
-{% endblock custom_js %}
+{% endblock javascripts %}
 

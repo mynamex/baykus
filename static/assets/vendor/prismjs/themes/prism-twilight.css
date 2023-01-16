@@ -65,7 +65,7 @@ code[class*="language-"]::selection, code[class*="language-"] ::selection {
 	background: hsla(0, 0%, 93%, 0.15); /* #EDEDED */
 }
 
-/* Inline code */
+/* Inline core */
 :not(pre) > code[class*="language-"] {
 	border-radius: .3em;
 	border: .13em solid hsl(0, 0%, 33%); /* #545454 */

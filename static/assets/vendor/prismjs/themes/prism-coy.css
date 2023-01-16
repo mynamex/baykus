@@ -63,7 +63,7 @@ pre[class*="language-"] {
 	margin-bottom: 1em;
 }
 
-/* Inline code */
+/* Inline core */
 :not(pre) > code[class*="language-"] {
 	position: relative;
 	padding: .2em;

@@ -8,7 +8,6 @@
         let selectedBlokId = 0;
         $(document).ready(function () {
 
-            $("#daireContainer").css("visibility", "hidden");
             $("#jsGridDaires").jsGrid({
                 width: "100%",
                 height: "360px",
@@ -100,6 +99,7 @@
                 },
                 rowClick: function (args) {
                     {#console.log(args.item.id);#}
+                     $("#daireContainer").css('visibility', 'visible');
                 },
                 fields: [
                     {name: "id", title: "Id", type: "number", width: 10, visible: false, validate: "required"},

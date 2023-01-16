@@ -8,7 +8,6 @@ class Account(models.Model):
     name = models.CharField(max_length=100, null=True, unique=True)
     related_person_name = models.CharField(max_length=80, null=True)
     phone = models.CharField(max_length=20, null=True)
-
     licence_date = models.DateTimeField(default=datetime.now)
     license_status = models.BooleanField(default=True)
 
@@ -37,11 +36,14 @@ class Account(models.Model):
 
 class Apartments(models.Model):
     account = models.ForeignKey(Account, related_name="apartments", null=True, on_delete=models.CASCADE)
+    name = models.CharField(max_length=50, null=True)
     address = models.CharField(max_length=200, null=True)
 
-    name = models.CharField(max_length=50, null=True)
+    wifi_name = models.CharField(max_length=50, null=True)
+    wifi_pass = models.CharField(max_length=20, null=True)
+
     is_active = models.BooleanField(default=True)
-    data_last_modified = models.DateTimeField(auto_now=True, null=True)
+    data_created = models.DateTimeField(auto_now=True, null=True)
 
     class Meta:
         unique_together = ('account', 'name',)
@@ -71,8 +73,10 @@ class Devices(models.Model):
     name = models.CharField(max_length=50, null=True)
     is_active = models.BooleanField(default=True)
 
-    api_key = models.CharField(max_length=64, default=uuid.uuid1())
-    data_last_modified = models.DateTimeField(auto_now=True, null=True)
+    api_key = models.CharField(max_length=32, default=uuid.uuid1())
+    data_created = models.DateTimeField(auto_now=True, null=True)
+
+    # roles = models.ManyToManyField("Role", related_name="devices")
 
     class Meta:
         unique_together = ('apartments', 'name',)
@@ -81,14 +85,16 @@ class Devices(models.Model):
         return self.name
 
 
-class Props(models.Model):
-    devices = models.ForeignKey(Devices, related_name="props", null=True, on_delete=models.CASCADE)
+class Role(models.Model):
+    devices = models.ForeignKey(Devices, related_name="role", null=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=50, null=True)
     is_active = models.BooleanField(default=True)
-    data_last_modified = models.DateTimeField(auto_now=True, null=True)
-
-    class Meta:
-        unique_together = ('devices', 'name',)
+    data_created = models.DateTimeField(auto_now=True, null=True)
+    key = models.CharField(max_length=16, default=uuid.uuid1())
 
     def __str__(self):
         return self.name
+
+
+    class Meta:
+        unique_together = ('devices', 'name',)

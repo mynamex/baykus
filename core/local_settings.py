@@ -3,14 +3,14 @@ from pathlib import Path
 from datetime import timedelta
 from decouple import config
 
-from code import settings
+from core import settings
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 DATABASES = {
         "default": {
             "ENGINE": config("POSTGRES_ENGINE", default="django.db.backends.sqlite3"),
-            "NAME": config("POSTGRES_DB", default=BASE_DIR / "call_center_db.db"),
+            "NAME": config("POSTGRES_DB", default=BASE_DIR / "baykus_db.db"),
             "USER": config("POSTGRES_USER", default="user"),
             "PASSWORD": config("POSTGRES_PASSWORD", default="password"),
             "HOST": config("POSTGRES_HOST", default="localhost"),

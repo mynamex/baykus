@@ -460,7 +460,7 @@ var Charts = (function() {
 })();
 
 //
-// Icon code copy/paste
+// Icon core copy/paste
 //
 
 'use strict';

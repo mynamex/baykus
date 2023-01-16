@@ -19,7 +19,7 @@
                 <div class="card-body">
                   <div class="row">
                     <div class="col">
-                      <h5 class="card-title text-uppercase text-muted mb-0">Müşteri sayısı</h5>
+                      <h5 class="card-title text-uppercase text-muted mb-0">Yer sayısı</h5>
                       <span class="h2 font-weight-bold mb-0 text-white">{{ customers_count }}</span>
                     </div>
                     <div class="col-auto">
@@ -49,7 +49,7 @@
         <div class="card">
           <!-- Card header -->
           <div class="card-header border-0">
-            <h3 class="mb-0 text-white" >Proje Listesi</h3>
+            <h3 class="mb-0 text-white" >Yerlerim</h3>
           </div>
           <!-- Light table -->
           <div class="table-responsive">
@@ -66,73 +66,6 @@
               </thead>
               <tbody class="list">
 
-              {% for customer in customers %}
-                  <tr>
-
-
-
-                   <th scope="row">
-                        <div class="media align-items-center">
-                            <a href="#" class="avatar rounded-circle mr-3" id="td_img">{{customer.site_name.0}}</a>
-                            <div class="media-body">
-                                <span id="id_owner_name" class="name mb-0 text-sm text-capitalize text-white">{{customer.site_name}}</span>
-                            </div>
-                        </div>
-                    </th>
-
-                  <td>
-                    <span class="badge badge-dot mr-4">
-                      <i class="{% if customer.license_status %} bg-success {% else %} bg-warning {% endif %}"></i>
-                      <span class="status">{% if customer.license_status %} aktif {% else %} pasif {% endif %}</span>
-                    </span>
-                  </td>
-                  <td>
-                      <span class="badge badge-dot mr-4">
-                        <i class="bg-gradient-blue"></i>
-                        <span class="status text-muted text-capitalize">{{customer.related_person_name}}</span>
-                    </span>
-
-                  </td>
-
-
-                  <td>
-                    <div class="d-flex align-items-center">
-                      <span class="completion mr-2  {% if date_now|timesince:customer.licence_date == "0 minutes" %} text-red {% else %} text-green {% endif %}">{{ date_now|timesince:customer.licence_date }}</span>
-{#                      <div>#}
-{#                            {{ customer.licence_date|date:"SHORT_DATE_FORMAT" }}#}
-{#                      </div>#}
-
-                        <div>
-                             {{ customer.licence_date|date:"SHORT_DATE_FORMAT" }}
-                      </div>
-
-                    </div>
-                  </td>
-
-{#                                   <td>#}
-{#                    <div class="d-flex align-items-center">#}
-{#                      <span class="completion mr-2 text-cyan">98%</span>#}
-{#                      <div>#}
-{#                        <div class="progress">#}
-{#                          <div class="progress-bar bg-warning" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 98%;"></div>#}
-{#                        </div>#}
-{#                      </div>#}
-{#                    </div>#}
-{#                  </td>#}
-{#                  #}
-                  <td class="text-right">
-                    <div class="dropdown">
-                      <a class="btn btn-sm btn-icon-only text-light" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fas fa-ellipsis-v"></i>
-                      </a>
-                      <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
-                        <a class="dropdown-item" href="{% url 'staff_me:customer' customer.pk %}">Detay</a>
-{#                        <a class="dropdown-item" href="{% url 'staff_me:edit_customer' customer.pk %}">Düzenle</a>#}
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              {% endfor %}
 
               </tbody>
             </table>

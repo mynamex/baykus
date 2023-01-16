@@ -135,7 +135,7 @@ var _ = {
 				//
 				// Error
 				//    at _.util.currentScript (http://localhost/components/prism-core.js:119:5)
-				//    at Global code (http://localhost/components/prism-core.js:606:1)
+				//    at Global core (http://localhost/components/prism-core.js:606:1)
 
 				var src = (/at [^(\r\n]*\((.*):.+:.+\)$/i.exec(err.stack) || [])[1];
 				if (src) {
@@ -242,7 +242,7 @@ var _ = {
 		var env = {
 			callback: callback,
 			container: container,
-			selector: 'code[class*="language-"], [class*="language-"] code, code[class*="lang-"], [class*="lang-"] code'
+			selector: 'core[class*="language-"], [class*="language-"] core, core[class*="lang-"], [class*="lang-"] core'
 		};
 
 		_.hooks.run('before-highlightall', env);

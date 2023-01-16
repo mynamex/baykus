@@ -1,0 +1,140 @@
+ <div class="table-responsive">
+                <!-- Projects table -->
+    <div class="col">
+        <div id="jsGridApartments"></div>
+    </div>
+
+</div>
+
+
+{% block custom_js %}
+    <script>
+        $(document).ready(function () {
+            $("#jsGridApartments").jsGrid({
+                width: "100%",
+                height: "250px",
+                inserting: true,
+                {#filtering: true,#}
+                selecting: true,
+                editing: true,
+                sorting: true,
+                autoload: true,
+                paging: true,
+                controller: {
+                    loadData: function () {
+                        let d = $.Deferred();
+                        $.ajax({
+                            method: 'GET',
+                            url:"{% url 'apartments_view' %}",
+                            dataType: "json",
+                            data: {
+                                {#"account_id": {{ customer.pk }},#}
+                                "csrfmiddlewaretoken": '{{ csrf_token }}'
+                            },
+                        }).done(function (response) {
+                            {#console.log(response)#}
+                            d.resolve(response.d_apartments);
+                        });
+
+                        return d.promise();
+                    }
+                },
+                onItemDeleting: function (args) {
+                    console.log(args);
+                    console.log("silmek istediğiniz kullanıcının durumunu pasif yapınız");
+                },
+                onItemInserting: function (args) {
+                    $.ajax({
+                        method: 'POST', dataType: "json", async:false,
+                        url:"{% url 'apartments_view' %}",
+
+                        data: {
+                            "in_go":"create",
+
+                            "name": args.item.name,
+                            "address": args.item.address,
+                             "wifi_name": args.item.wifi_name,
+                             "wifi_pass": args.item.wifi_pass,
+                            "is_active": args.item.is_active,
+                            "csrfmiddlewaretoken": '{{ csrf_token }}'
+                        },
+                    }).done(function (response) {
+                        if (response.result) {
+                            const {new_apartments_id}=response
+                            args.item.id = new_apartments_id
+                            args.item.is_active = true;
+                            MyToastSuccess("Kullanıcı Kaydedildi")
+
+                            $(".jsgrid-insert-mode-button").click()
+                        } else {
+                            if (response.status_message)
+                                MyToastWarn(response.status_message);
+                            args.cancel = true;
+                        }
+                    });
+                },
+                onItemUpdating: function (args) {
+                    $.ajax({
+                        method: 'POST',
+                        url:"{% url 'apartments_view' %}",
+                        dataType: "json",
+                          async:false,
+                        data: {
+                            "in_go":"update",
+                            {#"account_id": {{ customer.pk }},#}
+                            "ap_id": args.item.id,
+                            "name": args.item.name,
+                            "address": args.item.address,
+                            "wifi_name": args.item.wifi_name,
+                             "wifi_pass": args.item.wifi_pass,
+                            "is_active": args.item.is_active,
+                            "csrfmiddlewaretoken": '{{ csrf_token }}'
+
+                        },
+                    }).done(function (response) {
+                        if (response.result) {
+                            MyToastSuccess("updatte Başarılı");
+                            $(".jsgrid-edit-mode-button").click()
+                        } else {
+                            if (response.status_message)
+                                MyToastWarn(response.status_message);
+                             args.cancel = true;
+                        }
+                    });
+                },
+                rowClick: function (args) {
+                    {#console.log(args.item.id);#}
+                      $("#devicesContainer").css('visibility', 'visible');
+                          ap_id = args.item.id
+
+                         $("#id_label_ap_name").text("Yerleşke : "+args.item.name);
+                          $("#jsGridDevices").jsGrid("loadData");
+
+
+                },
+                fields: [
+                    {name: "id", title: "Id", type: "number", width: 10, visible: false},
+                    {name: "name", title: "İsim", type: "text", width: 50,
+                      validate: function(value, item) {
+                        return item.name.length < 49 && item.name.length > 4 }},
+
+                     {name: "wifi_name", title: "Wifi adı", type: "text", width: 50,
+                      validate: function(value, item) {
+                        return item.name.length < 49 && item.name.length > 4 }},
+
+                     {name: "wifi_pass", title: "Wifi şifre", type: "text", width: 50,
+                      validate: function(value, item) {
+                        return item.name.length < 20 && item.name.length > 5 }},
+
+                    {name: "address", title: "Adres", type: "text", width: 50,
+                       validate: function(value, item) {
+                        return item.address.length < 198 && item.address.length > 4 }},
+                    {name: "is_active", title: "Durum", type: "checkbox", width: 30, inserting: false},
+                    {type: "control", deleteButton: false}]
+            });
+        });
+    </script>
+
+
+{% endblock custom_js %}
+

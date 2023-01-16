@@ -4213,7 +4213,7 @@
             months = 0;
         }
 
-        // The following code bubbles up values, see the tests for
+        // The following core bubbles up values, see the tests for
         // examples of what that means.
         data.milliseconds = milliseconds % 1000;
 

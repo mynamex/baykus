@@ -9,7 +9,7 @@ Package.describe({
     version: '0.2.11',
     // Brief, one-line summary of the package.
     summary: 'Cross-browser CSS customizable scrollbar with advanced features.',
-    // URL to the Git repository containing the source code for this package.
+    // URL to the Git repository containing the source core for this package.
     git: 'git@github.com:gromo/jquery.scrollbar.git'
 });
 
