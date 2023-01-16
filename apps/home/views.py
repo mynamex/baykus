@@ -9,6 +9,7 @@ from django.shortcuts import render
 from django.template import loader
 from django.utils.decorators import method_decorator
 from django.views import View
+from django.views.decorators.csrf import csrf_exempt
 
 from apps.accounts.models import Account, Apartments, Devices, Role
 from apps.customauth.models import MyUser
@@ -272,3 +273,12 @@ class RoleView(View):
 
 def eD(val):
     return str(val).strip().lower()
+
+@csrf_exempt
+def Apis(request):
+
+    print("----------",request.headers["Api-Key"])
+    print("----------", request.headers["Data"])
+
+    return JsonResponse(
+        {"result": False, "karagoz": "134t"}, safe=False)
