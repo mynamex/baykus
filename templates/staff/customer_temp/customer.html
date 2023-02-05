@@ -23,7 +23,6 @@
 
 
                 <div class="row">
-
                     <div class="col-md-12">
                         <div class="card card-stats">
                             <!-- Card body -->
@@ -38,64 +37,55 @@
                                         </div>
                                     </div>
                                 </div>
+
                                 <nav aria-label="breadcrumb" class="d-md-inline-block">
-                                    <ol class="breadcrumb breadcrumb-link" style="background-color: #0c5460" >
+                                    <ol class="breadcrumb breadcrumb-link" style="background-color: #0c5460">
                                         <li class="breadcrumb-item"><a href="{% url 'staff_me:customer' customer.id %}"><i
                                                 class="fas fa-home"></i></a></li>
-                                        <li class="breadcrumb-item"><a href="{% url 'staff_me:customer_users' customer.id %}">Kullanıcılar</a>
+                                        <li class="breadcrumb-item"><a
+                                                href="{% url 'staff_me:customer_users' customer.id %}">Kullanıcılar</a>
                                         </li>
-                                        <li class="breadcrumb-item"><a href="{% url 'staff_me:show_gates' customer.id %}">Kapılar</a>
+                                        <li class="breadcrumb-item"><a
+                                                href="{% url 'staff_me:show_campus' customer.id %}">Yerleşkeler</a>
                                         </li>
-                                        <li class="breadcrumb-item"><a href="{% url 'staff_me:show_blocks' customer.id %}">Bloklar</a>
-                                        </li>
-                                        {#                                <li class="breadcrumb-item"><a href="#">Daireler</a></li>#}
-                                        {#                                <li class="breadcrumb-item active" aria-current="page">Detay</li>#}
+
                                     </ol>
                                 </nav>
                             </div>
                         </div>
                     </div>
 
-
-
-
-
-
-
-
-                    <div class="col-xl-3 col-md-6">
-                        <div class="card card-stats">
-                            <!-- Card body -->
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col">
-                                        <h5 class="card-title text-uppercase text-muted mb-0">Kullanıcı Sayısı</h5>
-                                        <span class="h2 font-weight-bold mb-0 text-white">{{ user_count }}</span>
-                                    </div>
-                                    <div class="col-auto">
-                                        <div class="icon icon-shape bg-gradient-red text-white rounded-circle shadow">
-                                            <i class="ni ni-active-40"></i>
-                                        </div>
+                      {% if go_to == "customer_main" %}
+                        <div class="col-xl-3 col-md-6">
+                    <div class="card card-stats">
+                        <!-- Card body -->
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <h5 class="card-title text-uppercase text-muted mb-0">Kullanıcı Sayısı</h5>
+                                    <span class="h2 font-weight-bold mb-0 text-white">{{ user_count }}</span>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="icon icon-shape bg-gradient-red text-white rounded-circle shadow">
+                                        <i class="ni ni-active-40"></i>
                                     </div>
                                 </div>
-                                <p class="mt-3 mb-0 text-sm">
-                                    <span class="text-success mr-2"><i class="fa fa-arrow-up"></i></span>
-                                    <span class="text-nowrap " style="color:#8898aa">Erişim sahipleri </span>
-
-                                </p>
                             </div>
+                            <p class="mt-3 mb-0 text-sm">
+                                <span class="text-success mr-2"><i class="fa fa-arrow-up"></i></span>
+                                <span class="text-nowrap " style="color:#8898aa">Erişim sahipleri </span>
+
+                            </p>
                         </div>
                     </div>
-
-
-
-                    <div class="col-xl-3 col-md-6">
+                </div>
+                        <div class="col-xl-3 col-md-6">
                         <div class="card card-stats">
                             <!-- Card body -->
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col">
-                                        <h5 class="card-title text-uppercase text-muted mb-0">Giriş Kapıları</h5>
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Yerleşkeler</h5>
                                         <span class="h2 font-weight-bold mb-0 text-white">{{ gates_count }}</span>
                                     </div>
                                     <div class="col-auto">
@@ -111,50 +101,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-xl-3 col-md-6">
-                        <div class="card card-stats">
-                            <!-- Card body -->
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col">
-                                        <h5 class="card-title text-uppercase text-muted mb-0">Blok</h5>
-                                        <span class="h2 font-weight-bold mb-0 text-white">{{ blocks_count }}</span>
-                                    </div>
-                                    <div class="col-auto">
-                                        <div class="icon icon-shape bg-gradient-green text-white rounded-circle shadow">
-                                            <i class="ni ni-money-coins"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <p class="mt-3 mb-0 text-sm">
-                                    <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> </span>
-                                    <span class="text-nowrap"></span>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-md-6">
-                        <div class="card card-stats">
-                            <!-- Card body -->
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col">
-                                        <h5 class="card-title text-uppercase text-muted mb-0">Daireler</h5>
-                                        <span class="h2 font-weight-bold mb-0 text-white">{{ daire_count }}</span>
-                                    </div>
-                                    <div class="col-auto">
-                                        <div class="icon icon-shape bg-gradient-info text-white rounded-circle shadow">
-                                            <i class="ni ni-chart-bar-32"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <p class="mt-3 mb-0 text-sm">
-                                    <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> 3.48%</span>
-                                    <span class="text-nowrap" style="color:#8898aa">Doluluk oranı</span>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+
+                      {% endif %}
+
                 </div>
             </div>
         </div>
@@ -210,20 +159,6 @@
 
                                 <tr>
                                     <th scope="row">
-                                 <span class="badge badge-dot mr-4">
-                                <i class="bg-warning"></i>
-                                <span class="status" style="color:#8898aa">Vergi No</span>
-                                </span>
-                                    </th>
-
-                                    <td>
-                                        <span class="name mb-0 text-capitalize"
-                                              style="color:#8898aa">  {{ customer.tax_number }}</span>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <th scope="row">
                                 <span class="badge badge-dot mr-4">
                                 <i class="bg-warning"></i>
                                 <span class="status" style="color:#8898aa">Telefon</span>
@@ -273,11 +208,13 @@
             </div>
 
         {% elif go_to == "show_customer_users" %}
-            {% include 'staff/customer_temp/tables/table-apartments.html' %}
-        {% elif go_to == "show_gates" %}
-            {% include 'staff/customer_temp/tables/table-gates.html' %}
-        {% elif go_to == "show_blocks" %}
-            {% include 'staff/customer_temp/tables/table-devices.html' %}
+            {% include 'staff/customer_temp/tables/table-users.html' %}
+        {% elif go_to == "show_campus" %}
+
+              {% include 'staff/customer_temp/tables/table-staff-campus.html' %}
+
+
+
             {#        {% elif go_to == "show_apartments" %}#}
             {#             {% include 'staff/customer_temp/tables/table-daires.html' %}#}
 
@@ -293,21 +230,21 @@
     <script type="text/javascript"> window.CSRF_TOKEN = "{{ csrf_token }}"; </script>
 
     <script>
-        function showTable(clicked) {
-            $(".iptable").hide();
-            let id = clicked.id
-            id = id.replace('link', '');
+        {#function showTable(clicked) {#}
+        {#    $(".iptable").hide();#}
+        {#    let id = clicked.id#}
+        {#    id = id.replace('link', '');#}
+        {##}
+        {#    document.getElementById(id).style.display = "block";#}
 
-            document.getElementById(id).style.display = "block";
-        }
 
     </script>
 
     <script>
-        $('#show-block-in_daires').on('click', function () {
+       /* $('#show-block-in_daires').on('click', function () {
 
             $('.form-wrapper').removeClass('hidden')
-        })
+        })*/
 
     </script>
 

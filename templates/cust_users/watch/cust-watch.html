@@ -1,0 +1,299 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{#{% block title %} Tables {% endblock title %}#}
+
+
+{% block content %}
+
+    <div class="header bg-primary pb-6">
+        <div class="container-fluid">
+            <div class="header-body">
+                <!-- Card stats -->
+
+                <div class="card">
+                    <div class="card-header card-header-icon">
+                        <div class="card-icon p-2">
+                            <i class="ni ni-building text-yellow"></i>
+                            <span class="nav-link-text text-white">Yerleşkeler</span>
+
+                            <select aria-label="Default select example" id="select_campus" class="form-control">
+                                {% for ap in d_apartments %}
+                                    <option value="{{ ap.id }}">{{ ap.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <span class="material-icons text-yellow">domain</span>
+                        <div class="table-responsive" id="id_info_apartment">
+                            <ul id="id_ul_list" class="list-group">
+                                {% for x in d_devices %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    {% if x.device_type == "output" %}
+                                        {% if "buzzer" in x.key %}
+                                            {% if x.status %}
+                                                <span class="material-icons text-yellow">volume_up</span>
+                                                <span class="status text-capitalize">{{ x.name }}</span>
+                                                <a type="button" class="btn btn-danger"
+                                                   href="javascript:go_ask({{ x.pk }})">Kapat</a>
+                                            {% else %}
+                                                <span class="material-icons text-gray-dark">volume_off</span>
+                                                <span class="status text-capitalize">{{ x.name }}</span>
+                                                <a type="button" class="btn btn-info"
+                                                   href="javascript:go_ask({{ x.pk }})">Aç</a>
+                                            {% endif %}
+
+                                        {% elif "flash_light" in x.key %}
+                                            {% if x.status %}
+                                                <span class="material-icons text-yellow">flash_on</span>
+                                                <span class="status text-capitalize">{{ x.name }}</span>
+                                                <a type="button" class="btn btn-danger"
+                                                   href="javascript:go_ask({{ x.pk }})">Kapat</a>
+                                            {% else %}
+                                                <span class="material-icons text-gray-dark">flash_off</span>
+                                                <span class="status text-capitalize">{{ x.name }}</span>
+                                                <a type="button" class="btn btn-info"
+                                                   href="javascript:go_ask({{ x.pk }})">Aç</a>
+                                            {% endif %}
+
+                                        {% elif "alarm" in x.key %}
+                                            {% if x.status %}
+                                                <span class="material-icons text-red">notifications_active</span>
+                                                <span id="t_its_self" class="status text-capitalize">{{ x.name }}</span>
+                                                <a type="button" class="btn btn-danger"
+                                                   href="javascript:go_ask({{ x.pk }})">Kapat</a>
+                                            {% else %}
+                                                <span class="material-icons text-gray-dark">notifications_off</span>
+                                                <span class="status text-capitalize">{{ x.name }}</span>
+                                                <a type="button" class="btn btn-info"
+                                                   href="javascript:go_ask({{ x.pk }});">Aç</a>
+                                            {% endif %}
+                                        {% endif %}
+                                        <!-- sensor -->
+                                    {% elif  x.device_type == "input" %}
+                                        {% if "temp" in x.key %}
+                                            <span class="material-icons text-red">local_fire_department</span>
+                                            <span class="status text-capitalize">{{ x.name }}</span>
+                                            <span class="badge badge-primary">{{ x.label }} c°</span>
+
+                                        {% elif "humid"  in x.key %}
+                                            <span class="material-icons text-yellow">severe_cold</span>
+                                            <span class="status text-capitalize">{{ x.name }}</span>
+                                            <span class="badge badge-primary">{{ x.label }}</span>
+
+                                        {% elif "amlight"  in x.key %}
+                                            {% if x.status %}
+                                                <span class="material-icons text-yellow">emoji_objects</span>
+                                            {% else %}
+                                                <span class="material-icons text-gray-dark">emoji_objects</span>
+                                            {% endif %}
+                                            <span class="status text-capitalize">{{ x.name }}</span>
+                                            <span class="badge badge-primary">{{ x.label }} l</span>
+
+                                        {% elif "pir_sensor"  in x.key %}
+                                            {% if x.status %}
+                                                <span class="material-icons text-yellow">trending_up</span>
+                                            {% else %}
+                                                <span class="material-icons text-gray-dark">trending_down</span>
+                                            {% endif %}
+                                            <span class="status text-capitalize">{{ x.name }}</span>
+                                            <span class="badge badge-primary">{{ x.label }}</span>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {#    ------------------------------------------------ Cart Bottom --------------------------------------------------#}
+
+
+
+
+
+{% endblock content %}
+
+{% block javascripts %}
+
+    <script>
+
+        function go_ask(device_id) {
+            let selected_ap_id = $("#select_campus").children("option:selected").val();
+
+            if (!selected_ap_id) {
+                selected_ap_id = "{{ first_id}}"
+            }
+
+            $.ajax({
+                type: 'post', async: false, dataType: "json",
+                url: "{% url 'watch_campus' %}",
+
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken")
+                },
+                data: {
+                    "in_go": "go_order",
+                    "ap_id": selected_ap_id,
+                    "device_id": device_id
+                },
+                {#"csrfmiddlewaretoken": '{{ csrf_token }}',#}
+                success: function (response) {
+                    const {success} = response
+
+                    if (success) {
+                        MyToastInfo(response.data.desc)
+                        go_fill(response.data.d_data)
+
+                    } else {
+                        MyToastWarn(response.data.desc);
+                    }
+                },
+                error: function (response) {
+                    MyToastError(response)
+                }
+            })
+        }
+
+        function go_fill(data) {
+            let icon = null
+            let icon_color = null
+            let button_color = null
+            let button_text = null
+
+            $('#id_ul_list').empty()
+            data.forEach(x => {
+                let op = ""
+                op += '<li class="list-group-item d-flex justify-content-between align-items-center">'
+
+                if (x.device_type.includes("output")) {
+
+                    if (x.key.includes("buzzer")) {
+                        if (x.status) {
+                            icon = "volume_up"
+                            icon_color = "text-yellow"
+                            button_color = "btn btn-danger"
+                            button_text = "Kapat"
+                        } else {
+                            icon = "volume_off"
+                            icon_color = "text-gray-dark"
+                            button_color = "btn btn-info"
+                            button_text = "Aç"
+                        }
+                    } else if (x.key.includes("flash_light")) {
+                        if (x.status) {
+                            icon = "flash_on"
+                            icon_color = "text-yellow"
+                            button_color = "btn btn-danger"
+                            button_text = "Kapat"
+                        } else {
+                            icon = "volume_up"
+                            icon_color = "text-gray-dark"
+                            button_color = "btn btn-info"
+                            button_text = "Aç"
+                        }
+                    } else if (x.key.includes("alarm")) {
+                        if (x.status) {
+                            icon = "notifications_off"
+                            icon_color = "text-yellow"
+                            button_color = "btn btn-danger"
+                            button_text = "Kapat"
+                        } else {
+                            icon = "notifications_active"
+                            icon_color = "text-gray-dark"
+                            button_color = "btn btn-info"
+                            button_text = "Aç"
+                        }
+                    }
+                    op += `<span class="material-icons ${icon_color}">${icon}</span><span class="status text-capitalize">${x.name ? x.name : "-"}</span><a type="button" class=" ${button_color}" href="javascript:go_ask(${x.pk})" >${button_text}</a>`
+                }
+                else if (x.device_type.includes("input")) {
+                    console.log(x)
+                    if (x.key.includes("temp")) {
+                        if (x.status) {
+                            icon = "local_fire_department"
+                            icon_color = "material-icons text-yellow"
+                        } else {
+                            icon = "local_fire_department"
+                            icon_color = "material-icons text-gray-dark"
+                        }
+                    } else if (x.key.includes("humid")) {
+                        if (x.status) {
+                            icon = "severe_cold"
+                            icon_color = "material-icons text-yellow"
+                        } else {
+                            icon = "severe_cold"
+                            icon_color = "material-icons text-gray-dark"
+                        }
+                    } else if (x.key.includes("amlight")) {
+                        if (x.status) {
+                            icon = "emoji_objects"
+                            icon_color = "material-icons text-yellow"
+                        } else {
+                            icon = "emoji_objects"
+                            icon_color = "material-icons text-gray-dark"
+                        }
+                    } else if (x.key.includes("pir_sensor")) {
+                        if (x.status) {
+                            icon = "trending_up"
+                            icon_color = "material-icons text-yellow"
+                        } else {
+                            icon = "trending_down"
+                            icon_color = "material-icons text-gray-dark"
+                        }
+                    }
+                    op += `<span class="material-icons ${icon_color}">${icon}</span><span class="status text-capitalize">${x.name}</span><span class="status text-capitalize">${x.label ? x.label : "-"}</span>`
+                }
+
+                op += '</li>'
+                $('#id_ul_list').append(op)
+            })
+        }
+
+
+
+        $(function () {
+            {# blok seç#}
+            $("#select_campus").change(function (e) {
+                e.preventDefault();
+
+                let selected_ap_id = $(this).children("option:selected").val();
+
+                if (selected_ap_id) {
+                    $.ajax({
+                        type: 'post', async: false, dataType: "json",
+                        url: "{% url 'watch_campus' %}",
+
+                        headers: {
+                            "X-CSRFToken": getCookie("csrftoken")
+                        },
+                        data: {
+                            "in_go": "go_get",
+                            "ap_id": selected_ap_id
+                        },
+
+                        success: function (response) {
+                            const {success} = response
+                            if (success) {
+                                go_fill(response.data.d_data)
+                            } else {
+                                MyToastWarn(response.data.desc);
+                                args.cancel = true;
+                            }
+                        },
+                        error: function (response) {
+                            MyToastError(response)
+                            args.cancel = true;
+                        }
+                    })
+                } else MyToastWarn("yerleşke bulunamadı")
+            });
+
+        });
+    </script>
+{% endblock %}

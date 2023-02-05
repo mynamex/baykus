@@ -16,17 +16,21 @@ function getCookie(name) {
 }
 
 jQuery(function ($){
-  $("spinner-border").fadeIn(500);
-  let loading = ` <div class="spinner-border"> <div/>&nbsp;&nbsp; Please wait..`
+ // $("spinner-border").fadeIn(500);
+ // let loading = ` <div class="spinner-border"> <div/>&nbsp;&nbsp; Please wait..`
 $(document).ajaxSend(function(){
+
+      console.log("ajaxSend");
     $("#bg-spinner").fadeIn(250);
 });
 $(document).ajaxComplete(function(){
+      console.log("ajaxComplete");
     $("#bg-spinner").fadeOut(250);
 });
     $(document).ajaxError(function (event, jqXHR, ajaxSettings, thrownError) {
         // toastr.error("ERROR", "<li>" + thrownError + "</li>");
           $("#bg-spinner").fadeOut(250);
+        console.log("ajaxError")
 
     });
 

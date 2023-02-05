@@ -1,0 +1,232 @@
+<style>
+    .jsgrid-cell {
+        font-size:.875rem;
+    }
+</style>
+
+
+
+{#<div class="row">#}
+{#    <div class="col-xl-12">#}
+{#        <div class="card-header border-0">#}
+{#            <div class="row align-items-center">#}
+{#                <div class="col">#}
+{#                    <h3 class="mb-0">Gelen ziyareçti bilgileri</h3>#}
+{#                </div>#}
+{#                <div class="col text-right">#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#        <div class="table-responsive">#}
+{#            <!-- Projects table -->#}
+{#            <div class="col">#}
+{#                <div id="jsGridReports"></div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#</div>#}
+{##}
+
+  <div id="jsGridReports" class="table-responsive"></div>
+
+
+{% block custom_js %}
+
+    <script>
+        let d_filter_securities_data = null;
+        $(document).ready(function () {
+            $("#jsGridReports").jsGrid({
+                width: "100%",
+                height: "430px",
+                inserting: false,
+                {#filtering: true,#}
+                selecting: true,
+                editing: false,
+                sorting: true,
+
+                //autoload: true,
+                loadMessage: "Lütfen bekleyin...",
+                invalidMessage: "Hatalı Data Girişi!",
+                noDataContent: "Liste boş",
+
+                {#gridview: true,#}
+
+                paging: true,
+                pageLoading:true,
+                pageSize: 10,
+                pageButtonCount:10,
+                pagePrevText: "<",
+                pageNextText: ">",
+                pageFirstText: "<<",
+                pageLastText: ">>",
+                {#pagerFormat: "Sayfalar: {prev}   {pages}  {next} ",#}
+                pagerFormat: "Sayfalar: {first} {prev} {pages} {next} {last}  {pageIndex} de {pageCount} ",
+                {#&nbsp;&nbsp; total pages: {pageCount}#}
+                controller: {
+
+                    loadData: function (filter) {
+                        {#debugger#}
+                        let data = [],
+                            dataCount=0;
+
+                        let startIndex = (filter.pageIndex - 1) * filter.pageSize;
+                        report_js.values.filter.first_count = startIndex
+                        report_js.values.filter.last_count = startIndex + 10
+
+                        $("#id_bottom_container").css("visibility", "hidden")
+                        $.ajax({
+                            type: 'POST',
+                            url: "{% url 'visitors:ask_report' %}",
+                            dataType: "json",
+                            async: false, //?!?
+                            data: report_js.values.filter,
+
+                            success: function (response) {
+
+                                // if not valid user, alert the user
+                                if (response["success"]) {
+
+                                    const {report_data_first_100, data_count } = response
+                                    if (report_data_first_100) {
+
+                                        $("#id_bottom_container").css("visibility", "visible")
+                                        $("#id_report").text("Raporlama "+ report_js.values.filter.start_date.split("T")[0]+"    /   "+ report_js.values.filter.start_date.split("T")[0])
+                                        const my_keys = [
+                                            "apartment__block__name",
+                                            "apartment__name",
+                                            "person__name",
+                                            "visitor_name",
+                                            "visitor_car_plate",
+                                            "security__name",
+                                            "gate__gate_name",
+                                            "visitor_car_plate",
+                                            "reason_for_visit__reason_name",
+                                            "reason_answer__answer_name",
+                                            "data_created"]
+
+                                        let add_array=[]
+
+                                        report_data_first_100.forEach(obj => {
+                                            const j_d = {};
+                                            Object.entries(obj).forEach(([key, value]) => {
+                                                {#console.log(`${key} ${value}`);#}
+
+                                                if (key === "10"){
+                                                    const [date, time] = value.split("T")
+                                                    value = date + " "+ time.split(".")[0]
+                                                }
+                                                j_d[my_keys[key]] = value || "";
+                                            });
+                                            add_array.push(j_d)
+                                        })
+
+                                        data = add_array
+                                        dataCount = data_count
+                                    }
+                                } else MyToastWarn("blok eşleşmedi");
+                            },
+                            error: function (response) {
+                                MyToastError(response)
+                            }
+                        })
+
+                        return {
+                            data: data,
+                            itemsCount: dataCount
+                        };
+                    }
+                },
+                onItemDeleting: function (args) {
+                    console.log(args);
+                    console.log("silmek istediğiniz kullanıcının durumunu pasif yapınız");
+                },
+
+                onItemInserting: function (args) {
+                },
+
+                onItemUpdating: function (args) {
+                },
+                rowClick: function (args) {
+                    {#console.log(args.item.id);#}
+                },
+                fields: [
+                    {name: "apartment__block__name", title: "Blok", type: "text", width: 100},
+                    {name: "apartment__name", title: "Daire", type: "text", width: 100},
+                    {name: "person__name",
+                        itemTemplate: function(value, item) {
+                            return $("<span>").attr("class", "status text-capitalize")
+                                .text(value.toLowerCase())
+                        },title: "Daire Sakini", type: "text", width: 150},
+                    {name: "visitor_name",
+                        itemTemplate: function(value, item) {
+                            return $("<span>").attr("class", "status text-capitalize")
+                                .text(value.toLowerCase())
+                        },title: "Ziyaretçi Adı", type: "text", width: 150},
+                    {name: "visitor_car_plate", title: "Plaka", type: "text", width: 60},
+                    {name: "security__name",
+                        itemTemplate: function(value, item) {
+                            return $("<span>").attr("class", "status text-capitalize")
+                                .text(value.toLowerCase())
+                        },
+                        title: "Güvenlik", type: "text", width: 150},
+                    {name: "gate__gate_name", title: "kapı", type: "text", width: 150},
+                    {name: "reason_for_visit__reason_name",
+                        items:
+                            [
+                                {#$("#id_select_reason")#}
+                                { Name: "Kargo", Id: 1},
+                                { Name: "Misafir", Id: 2},
+                                { Name: "Sipariş", Id: 3},
+                                { Name:"Tadilat", Id: 4},
+                                { Name:"Teknik Servis", Id: 5},
+                                { Name:"Temizlik", Id: 6},
+                                { Name:"Güvenlik", Id: 7},
+                                { Name:"Yönetim", Id: 8},
+                                { Name:"Diger", Id: 9}
+
+                            ],
+                        valueField: "Id",
+                        textField: "Name",
+                        selectedIndex: 0,
+                        title: "Ziyaret Nedeni", type: "select", width: 100},
+                    {name: "reason_answer__answer_name",
+                        itemTemplate: function(value, item) {
+
+                            if (value===1) {
+                                return ` <span class="badge badge-dot mr-4">
+                              <i class="bg-green"></i>
+                              <span class="status text-capitalize">Kabul Edildi</span>
+                            </span> `
+                            } else if (value===2) {
+                                return ` <span class="badge badge-dot mr-4">
+                              <i class="bg-red"></i>
+                              <span class="status text-capitalize">Red Edildi</span>
+                            </span> `
+                            } else if (value===3){
+                                return ` <span class="badge badge-dot mr-4">
+                                  <i class="bg-orange"></i>
+                                  <span class="status text-capitalize">Ulaşılamadı</span>
+                                </span> `
+                            }
+                            {##}
+                            {#return $("<span>").attr("class", "status text-capitalize")#}
+                            {#.attr("style", "bg-green")#}
+                            {#.text(textspan)#}
+                        },
+
+                        title: "Giriş izni", type: "text", width: 100},
+                    {name: "data_created", title: "Tarih", type: "text", width: 150},
+                    {type: "control", deleteButton: false, width: 10,  editButton: false, visible: false}]
+            });
+
+
+        });
+    </script>
+
+
+{% endblock custom_js %}
+
+{# <span class="badge badge-dot mr-4">#}
+{#  <i class="bg-green"></i>#}
+{#  <span class="status text-capitalize">verildi</span>#}
+{#</span>#}

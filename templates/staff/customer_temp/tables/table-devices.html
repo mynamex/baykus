@@ -1,48 +1,47 @@
-<div class="row">
-    <div class="col-xl-6">
-        <div class="card">
-            <div class="card-header border-0">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <h3 class="mb-0 text-white" id="id_label_ap_name">Cihazlarım</h3>
-                    </div>
-                    <div class="col text-right">
 
-                    </div>
-                </div>
-            </div>
-            <div class="table-responsive">
-                <!-- Projects table -->
-                <div class="col" id="devicesContainer" style=" visibility: hidden">
-                    <div id="jsGridDevices"></div>
-                </div>
+     <div id="jsGridDevices"></div>
 
-            </div>
-        </div>
-    </div>
+{#    <div class="col-xl-6 col-md-6 col-sm-12">#}
+{#        <div class="card">#}
+{#            <div class="card-header border-0">#}
+{#                <div class="row align-items-center">#}
+{#                    <div class="col">#}
+{#                        <h3 class="mb-0 text-white" id="id_label_ap_name">Cihazlarım</h3>#}
+{#                    </div>#}
+{#                    <div class="col text-right">#}
+{##}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#            <div class="table-responsive">#}
+{#                <!-- Projects table -->#}
+{#               <div id="jsGridDevices"></div>#}
+{##}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
 
-    <div class="col-xl-6">
-        <div class="card">
-            <div class="card-header border-0">
-                <div class="row align-items-center">
-
-                    <div class="col text-right">
-
-                         <h3 class="mb-0" id="id_label_device_name">Röleler</h3>
-                    </div>
-                </div>
-            </div>
-            <div class="table-responsive">
-                <!-- Projects table -->
-                <div class="col" id="roleContainer" style=" visibility: hidden">
-                     {% include 'staff/customer_temp/tables/table-roles.html' %}
-                    <div id="jsGridRoles"></div>
-                </div>
-
-            </div>
-        </div>
-    </div>
-</div>
+{#    <div class="col-xl-6 col-md-6 col-sm-12">#}
+{#        <div class="card">#}
+{#            <div class="card-header border-0">#}
+{#                <div class="row align-items-center">#}
+{##}
+{#                    <div class="col text-right">#}
+{##}
+{#                         <h3 class="mb-0" id="id_label_device_name">Röleler</h3>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#            <div class="table-responsive">#}
+{#                <!-- Projects table -->#}
+{#                <div class="col" id="roleContainer" style=" visibility: hidden">#}
+{#                     {% include 'staff/customer_temp/tables/table-roles.html' %}#}
+{#                    <div id="jsGridRoles"></div>#}
+{#                </div>#}
+{##}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
 
 
 
@@ -56,7 +55,7 @@
 
           $("#jsGridDevices").jsGrid({
                 width: "100%",
-                height: "250px",
+                height: "350px",
                 inserting: true,
                 {#filtering: true,#}
                 selecting: true,
@@ -69,15 +68,29 @@
                         let d = $.Deferred();
                         $.ajax({
                             method: 'GET',
-                            url:"{% url 'devices_view' %}",
+                            url:"{% url 'staff_me:devices_view' %}",
                             dataType: "json",
                             data: {
                                 "ap_id":ap_id,
+                                "account_id":{{ customer.pk }},
                                 "csrfmiddlewaretoken": '{{ csrf_token }}'
-                            },
-                        }).done(function (response) {
-                            d.resolve(response.d_data);
-                        });
+                            }, success: function (response) {
+                            const {success} = response
+
+                            if (success) {
+                                const {data} = response
+                                 d.resolve(data.d_data);
+
+                            } else {
+                                MyToastWarn(response.data.desc);
+
+                            }
+
+                        },
+                        error: function (err) {
+                            MyToastError(err);
+
+                        }})
 
                         return d.promise();
                     }
@@ -87,55 +100,77 @@
 
                     $.ajax({
                         method: 'POST', dataType: "json", async:false,
-                        url:"{% url 'devices_view' %}",
+                        url:"{% url 'staff_me:devices_view' %}",
 
                         data: {
                             "in_go":"create",
                             "ap_id":ap_id,
+
+                            "key": args.item.key,
+                            "device_type": args.item.device_type,
                             "name": args.item.name,
+                            "status": args.item.status,
+                            "is_active": args.item.is_active,
                             "csrfmiddlewaretoken": '{{ csrf_token }}'
                         },
-                    }).done(function (response) {
-                        if (response.result) {
-                            const {new_devices_id}=response
-                            args.item.id = new_devices_id
-                             args.item.is_active = true;
-                            MyToastSuccess("Cihaz Kaydedildi")
+                          success: function (response) {
+                            const {success} = response
+                            if (success) {
+                                const {data} = response
+                                args.item.pk =data.new_devices_id
+                                args.item.status = true;
+                                MyToastSuccess(data.desc)
+                                $(".jsgrid-insert-mode-button").click()
 
-                            $(".jsgrid-insert-mode-button").click()
-                        } else {
-                            if (response.status_message)
-                                MyToastWarn(response.status_message);
+                            } else {
+                                MyToastWarn(response.data.desc);
+                                args.cancel = true;
+                            }
+
+                        },
+                        error: function (err) {
+                            MyToastError(err);
                             args.cancel = true;
                         }
-                    });
+                    })
                 },
                 onItemUpdating: function (args) {
                     $.ajax({
                         method: 'POST',
-                        url:"{% url 'devices_view' %}",
+                        url:"{% url 'staff_me:devices_view' %}",
                         dataType: "json",
-                          async:false,
+                        async:false,
                         data: {
                             "in_go":"update",
                             "ap_id":ap_id,
-                            "dev_id": args.item.id,
+                            "dev_id": args.item.pk,
+                             "key": args.item.key,
+                            "device_type": args.item.device_type,
                             "name": args.item.name,
-                            "address": args.item.address,
+                            "status": args.item.status,
                             "is_active": args.item.is_active,
                             "csrfmiddlewaretoken": '{{ csrf_token }}'
 
                         },
-                    }).done(function (response) {
-                        if (response.result) {
-                            MyToastSuccess("updatte Başarılı");
-                            $(".jsgrid-edit-mode-button").click()
-                        } else {
-                            if (response.status_message)
-                                MyToastWarn(response.status_message);
-                             args.cancel = true;
+                          success: function (response) {
+                            const {success} = response
+                            if (success) {
+                                const {data} = response
+                                MyToastSuccess(data.desc)
+                                $(".jsgrid-edit-mode-button").click()
+
+                            } else {
+                                MyToastWarn(response.data.desc);
+                                args.cancel = true;
+                            }
+
+                        },
+                        error: function (err) {
+                            MyToastError(err);
+                            args.cancel = true;
                         }
-                    });
+
+                    })
                 },
                 rowClick: function (args) {
                     {#console.log(args.item.id);#}
@@ -147,13 +182,25 @@
 
                 },
                 fields: [
-                    {name: "id", title: "Id", type: "number", width: 10, visible: false},
-                    {name: "name", title: "İsim", type: "text", width: 50,
-                      validate: function(value, item) {
-                        return item.name.length < 50 && item.name.length > 2 }},
-                    {name: "is_active", title: "Durum", type: "checkbox", width: 30, inserting: false},
-                         {#{name: "api_key", title: "Key", type: "text", width: 30, inserting: false,  editing: false},#}
-                    {type: "control", deleteButton: false}]
+                    {name: "pk", title: "Id", type: "number", width: 40 ,visible: false},
+                    {name: "key", title: "key", type: "text", width: 71, validate: function(value, item) {
+                            console.log(item.key.length > 1 && item.key.length < 10)
+                        return item.key.length > 0 && item.key.length < 10}},
+                      {
+                        name: "device_type", width: 110, title: "Cihaz tipi", type: "select", selectedIndex: 0,
+                        items: [
+                            {Name: "Role", Id: "role"},
+                            {Name: "Sensor", Id: "sens"},
+                        ], valueField: "Id", textField: "Name", validate: function (value, item) {
+                            return item.device_type;
+                        }
+                    },
+                    {name: "name", title: "Cihaz adı", type: "text", width: 110,validate: function(value, item) {
+                        return item.name.length > 2 && item.name.length < 15 }},
+                    {name: "status", title:  "Durum", type: "checkbox", width: 80, inserting: false},
+                    {name: "is_active", title:  "Aktif", type: "checkbox", width: 80, inserting: false},
+                    {name: "label", title: "Değer", type: "text", width: 110,  editing: false, inserting: false},
+                    {type: "control",deleteButton: false}]
             });
         });
     </script>

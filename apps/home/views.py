@@ -2,19 +2,21 @@
 """
 Copyright (c) 2019 - present AppSeed.us
 """
+import datetime
+import json
 
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, HttpResponseBadRequest
 from django.shortcuts import render
 from django.template import loader
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
-from apps.accounts.models import Account, Apartments, Devices, Role
+from apps.accounts.models import Account, Apartments
 from apps.customauth.models import MyUser
 from apps.home.form import CreateApartments
-from apps.home.serializer import ApartmentsSerializer, DevicesSerializer, RoleSerializer
+from apps.home.serializer import ApartmentsSerializer, DevicesSerializer, ApartmentsSerializerCustomer
 from django.db import IntegrityError, transaction
 
 from utils.query_debuger import query_debugger
@@ -41,51 +43,28 @@ def is_NONE(val):
 @login_required(login_url='auth:login')
 def home(request):
     user = MyUser.objects.select_related("account").get(username=request.user)
-    context = {"segment": "home", "customer": Account.objects.get(id=user.account_id)}
-    html_template = loader.get_template('staff/staff-index.html')
-    return HttpResponse(html_template.render(context, request))
+    if user.is_salesman:
+        accounts = Account.objects.all()
+        date_now = datetime.datetime.now()
+        context = {
+            "segment": "index",
+            "date_now": date_now,
+            'customers': accounts,
+            'customers_count': len(accounts)}
 
-    # if user.is_person:
-    #     # context = get_cust_customer_detail(request.user.pk)
-    #
-    #     context = {"segment": "home", "customer": Account.objects.get(id=user.account_id, license_status=True)}
-    #     html_template = loader.get_template('cust_users/cust-index.html')
-    #     return HttpResponse(html_template.render(context, request))
-    #
-    # elif not user.is_person:
-    #     html_template = loader.get_template('home/page-no-official-user.html')
-    #     return HttpResponse(html_template.render({"context": "siz bir ofis görevlisi değilsiniz !"}, request))
+        html_template = loader.get_template('staff/staff-index.html')
+        return HttpResponse(html_template.render(context, request))
 
+    elif user:
+        # context = get_cust_customer_detail(request.user.pk)
 
-@login_required(login_url='auth:login')
-def createApart(request):
-    load_template = request.path
+        context = {"segment": "home", "customer": Account.objects.get(id=user.account_id, license_status=True)}
+        html_template = loader.get_template('cust_users/cust-index.html')
+        return HttpResponse(html_template.render(context, request))
 
-    msg = None
-    success = False
-
-    if request.method == "POST":
-        form = CreateApartments(request.POST)
-        if form.is_valid():
-            new_account = form.save()
-            new_account.salesman = request.user
-            new_account.save()
-            # site_name = form.cleaned_data.get("site_name")
-            # tax_number = form.cleaned_data.get("tax_number")
-            # related_person_name = form.cleaned_data.get("related_person_name")
-            # site_phone1 = form.cleaned_data.get("site_phone1")
-            # site_address = form.cleaned_data.get("site_address")
-            # licence_date = form.cleaned_data.get("licence_date")
-            return HttpResponseRedirect('/')
-
-
-        else:
-            msg = 'Form düzngün oluşturulunamadı'
-    else:
-        form = CreateApartments()
-
-    return render(request, "staff/customer_temp/create-apart.html",
-                  {"form": form, "segment": load_template, "msg": msg, "success": success})
+    elif not user.is_person:
+        html_template = loader.get_template('home/page-no-official-user.html')
+        return HttpResponse(html_template.render({"context": "siz bir ofis görevlisi değilsiniz !"}, request))
 
 
 @query_debugger
@@ -100,184 +79,209 @@ def aparts(request, pk_customer):
     return render(request, 'staff/customer_temp/customer.html', context)
 
 
-@method_decorator(my_decorators, name='dispatch')
-class ApartmentsView(View):
+@query_debugger
+@login_required(login_url='auth:login')
+def getApartments(request):
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
 
-    def get(self, request):
-        user = MyUser.objects.get(username=request.user)
+    if is_ajax:
 
-        d_apartments = Apartments.objects.filter(account=user.account)
+        if request.method == 'GET':
+            user = MyUser.objects.select_related("account").get(username=request.user.username)
 
-        return JsonResponse({"d_apartments": ApartmentsSerializer(d_apartments,many=True).data})
+            apartments = list(
+                Apartments.objects.filter(account=user.account, is_active=True).order_by(
+                    'name').values("id", "name"))
+            return JsonResponse({"success": True, 'apartments': apartments})
+        if request.method == 'POST':
+            data = json.load(request)
+            todo = data.get('payload')
+            # Todo.objects.create(task=todo['task'], completed=todo['completed'])
+            return JsonResponse({'status': 'Todo added!'})
 
-    def post(self, request):
-        user = MyUser.objects.select_related("account").get(username=request.user.username)
+        return JsonResponse({'status': 'Invalid request'}, status=400)
+    else:
+        return HttpResponseBadRequest('Invalid request')
 
-        if request.POST.get("in_go") == "update":
-            try:
 
-                ap = Apartments.objects.get(pk=request.POST.get("ap_id", None))
-                ap.name = eD(self.request.POST.get("name", ""))
-                ap.wifi_name = self.request.POST.get("wifi_name", "")
-                ap.wifi_pass = self.request.POST.get("wifi_pass", "")
-                ap.address = eD(self.request.POST.get("address", ""))
-                ap.is_active = is_true_or_false(self.request.POST.get("is_active", None))
-                ap.save()
+@login_required(login_url='auth:login')
+def custWatch(request):
+    user = MyUser.objects.select_related("account").get(pk=request.user.pk)
+    context = {}
+    apartment = Apartments.objects.filter(account=user.account, is_active=True)
 
-                return JsonResponse({"result": True}, safe=False)
 
-            except IntegrityError as e:
-                if str(e).__contains__("UNIQUE"):
-                    return JsonResponse({"result": False, "status_message": "Bu kullanıcı adı zatenkullanılıyor"},
-                                        safe=False)
-                else:
-                    return JsonResponse({"result": False, "status_message": str(e)}, safe=False)
-            except Exception as err:
-                print(err)
-                return JsonResponse({"result": False, "status_message": err}, safe=False)
+    context["customer"] = Account.objects.get(pk=user.account_id)
+    context["segment"] = "watch"
+    context["d_apartments"] = ApartmentsSerializerCustomer(apartment, many=True).data
+    context["first_id"] = apartment[0].pk
 
-        elif request.POST.get("in_go") == "create":
-            try:
-
-                new_apartments = Apartments.objects.create(
-                    account=Account.objects.get(pk=user.account.pk),
-                    name=request.POST.get('name'),
-                    wifi_name=self.request.POST.get("wifi_name", ""),
-                    wifi_pass=self.request.POST.get("wifi_pass", ""),
-                    address=request.POST.get('address', ""))
-
-                new_apartments.save()
-
-                return JsonResponse({"result": True, "new_apartments_id": new_apartments.pk})
-
-                # return JsonResponse({"result": True}, safe=False)
-
-            except IntegrityError as e:
-
-                return JsonResponse({"result": False, "status_message": "Bu  kullanıcı daha önce tanımlanmış"},
-                                    safe=False)
-            except Exception as err:
-                return JsonResponse({"result": False, "status_message": err}, safe=False)
+    context["d_devices"] = DevicesSerializer(apartment[0].devices.all().filter(is_active=True), many=True).data
+    return render(request, 'cust_users/watch/cust-watch.html', context)
 
 
 @method_decorator(my_decorators, name='dispatch')
-class DevicesView(View):
+class WatchCampus(View):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.apartment = None
+        self.success = True
+        self.data = {"desc": ""}
+        self.user = None
 
     def get(self, request):
-        user = MyUser.objects.get(username=request.user)
 
-        apartment = Apartments.objects.get(account=user.account, pk=request.GET.get("ap_id", None))
+        try:
+            apartment = Apartments.objects.get(account=request.GET.get("account_id", None),
+                                               pk=request.GET.get("ap_id", None))
 
-        d_devices = Devices.objects.filter(apartments=apartment)
+            self.data["d_data"] = DevicesSerializer(apartment.devices.all(), many=True).data
 
-        return JsonResponse({"d_data": DevicesSerializer(d_devices, many=True).data})
+        except Apartments.DoesNotExist:
+            self.data["desc"] = "Yerleşke Bulunamadı"
+            self.success = False
 
-    def post(self, request):
-        user = MyUser.objects.select_related("account").get(username=request.user.username)
+        except Exception as err:
+            self.data["desc"] = str(err)
+            self.success = False
 
-        apartment = Apartments.objects.get(pk=request.POST.get("ap_id", None), account=user.account)
-
-        # d_devices = Devices.objects.filter(apartments=user.account.apartments)
-
-        if request.POST.get("in_go") == "update":
-            try:
-                ap = Devices.objects.get(pk=request.POST.get("dev_id", None))
-                ap.name = eD(self.request.POST.get("name", ""))
-                ap.is_active = is_true_or_false(request.POST.get("is_active", None))
-                ap.save()
-
-                return JsonResponse({"result": True}, safe=False)
-
-            except IntegrityError as e:
-                if str(e).__contains__("UNIQUE"):
-                    return JsonResponse({"result": False, "status_message": "cihaz adı zaten kullanılıyor"},
-                                        safe=False)
-                else:
-                    return JsonResponse({"result": False, "status_message": str(e)}, safe=False)
-            except Exception as err:
-                print(err)
-                return JsonResponse({"result": False, "status_message": err}, safe=False)
-
-        elif request.POST.get("in_go") == "create":
-            try:
-
-                new_devices = Devices.objects.create(
-                    apartments=apartment,
-                    name=eD(request.POST.get("name", ""))
-                )
-
-                new_devices.save()
-                return JsonResponse({"result": True, "new_devices_id": new_devices.pk})
-
-                # return JsonResponse({"result": True}, safe=False)
-
-            except IntegrityError as e:
-                return JsonResponse({"result": False, "status_message": "Bu  cihaz adı daha önce tanımlanmış"},
-                                    safe=False)
-            except Exception as err:
-                return JsonResponse({"result": False, "status_message": err}, safe=False)
-
-@method_decorator(my_decorators, name='dispatch')
-class RoleView(View):
-
-    def get(self, request):
-        user = MyUser.objects.get(username=request.user)
-
-        d_devices = Role.objects.filter(devices_id=request.GET.get("device_id", None))
-
-
-        return JsonResponse({"d_data": RoleSerializer(d_devices, many=True).data})
+        return JsonResponse({"success": self.success, "data": self.data})
 
     def post(self, request):
 
-        dev = Devices.objects.get(pk=request.POST.get("device_id", None))
+        try:
+            with transaction.atomic():
 
-        if request.POST.get("in_go") == "update":
-            try:
-                ap = Role.objects.get(pk=request.POST.get("role_id", None))
-                ap.name = eD(request.POST.get("name", ""))
-                ap.is_active = is_true_or_false(request.POST.get("is_active", None))
-                ap.save()
+                apartment = Apartments.objects.get(pk=request.POST.get("ap_id", None), is_active=True)
 
-                return JsonResponse({"result": True}, safe=False)
+                if request.POST.get("in_go") == "go_get":
+                    self.data["d_data"] = DevicesSerializer(apartment.devices.all().filter(is_active=True), many=True).data
 
-            except IntegrityError as e:
-                if str(e).__contains__("UNIQUE"):
-                    return JsonResponse({"result": False, "status_message": "cihaz adı zaten kullanılıyor"},
-                                        safe=False)
+                elif request.POST.get("in_go") == "go_order":
+                    device = apartment.devices.get(pk= self.request.POST.get("device_id", ""))
+                    if device.status:
+                        device.status = False
+                        self.data["desc"] = "{} kapatıldı".format(device.name)
+                    else:
+                        device.status = True
+                        self.data["desc"] = "{} açıldı".format(device.name)
+
+                    device.save()
+
+                    self.data["d_data"] = DevicesSerializer(apartment.devices.all().filter(is_active=True),
+                                                            many=True).data
+
+
+                elif request.POST.get("in_go") == "update":
+                    ap = apartment.device.get(pk=request.POST.get("dev_id", None))
+
+                    ap.name = eD(self.request.POST.get("name", ""))
+                    ap.key = self.request.POST.get("key", "")
+                    ap.device_type = self.request.POST.get("device_type", "")
+                    ap.status = is_true_or_false(request.POST.get("status", None))
+                    ap.is_active = is_true_or_false(request.POST.get("is_active", None))
+                    ap.save()
+                    apartment.save()
+                    self.data["desc"] = "cihaz güncellendi"
+
+                elif request.POST.get("in_go") == "create":
+
+                    self.data["desc"] = "Yeni bir cihaz yaratıldı"
+                    self.data["new_devices_id"] = None
+
+
+        except IntegrityError as e:
+            if str(e).__contains__("UNIQUE"):
+                if str(e).__contains__("accounts_device.key"):
+                    self.data["desc"] = "Bu key kullanılıyor"
+                elif str(e).__contains__("accounts_device.name"):
+                    self.data["desc"] = "Bu cihaz adı kullanılıyor"
                 else:
-                    return JsonResponse({"result": False, "status_message": str(e)}, safe=False)
-            except Exception as err:
-                print(err)
-                return JsonResponse({"result": False, "status_message": err}, safe=False)
+                    self.data["desc"] = "Zaten var" + str(e)
+            else:
+                self.data["desc"] = str(e)
 
-        elif request.POST.get("in_go") == "create":
-            try:
+            self.success = False
 
-                new_role = Role.objects.create(
-                    devices=dev,
-                    name=eD(request.POST.get("name", ""))
-                )
+        except Exception as err:
+            self.data["desc"] = str(err)
+            self.success = False
 
-                new_role.save()
-                return JsonResponse({"result": True, "new_role_id": new_role.pk})
+        return JsonResponse({"success": self.success, "data": self.data})
 
-                # return JsonResponse({"result": True}, safe=False)
 
-            except IntegrityError as e:
-                return JsonResponse({"result": False, "status_message": "Bu  cihaz adı daha önce tanımlanmış"},
-                                    safe=False)
-            except Exception as err:
-                return JsonResponse({"result": False, "status_message": err}, safe=False)
+# @login_required(login_url='auth:login')
+# def GetApartments(request):
+#     user = MyUser.objects.get(username=request.user)
+#     apartments = Apartments.objects.filter(account=user.account)
+#     context = {
+#         'account': user.account,
+#         "apartments": apartments
+#     }
+#     return render(request, 'cust_users/blocks/get-apartments.html', context)
+
+
+# @method_decorator(my_decorators, name='dispatch')
+# class RoleView(View):
+#
+#     def get(self, request):
+#         user = MyUser.objects.get(username=request.user)
+#
+#         d_devices = Role.objects.filter(devices_id=request.GET.get("device_id", None))
+#
+#
+#         return JsonResponse({"d_data": RoleSerializer(d_devices, many=True).data})
+#
+#     def post(self, request):
+#
+#         dev = Devices.objects.get(pk=request.POST.get("device_id", None))
+#
+#         if request.POST.get("in_go") == "update":
+#             try:
+#                 ap = Role.objects.get(pk=request.POST.get("role_id", None))
+#                 ap.name = eD(request.POST.get("name", ""))
+#                 ap.is_active = is_true_or_false(request.POST.get("is_active", None))
+#                 ap.save()
+#
+#                 return JsonResponse({"result": True}, safe=False)
+#
+#             except IntegrityError as e:
+#                 if str(e).__contains__("UNIQUE"):
+#                     return JsonResponse({"result": False, "status_message": "cihaz adı zaten kullanılıyor"},
+#                                         safe=False)
+#                 else:
+#                     return JsonResponse({"result": False, "status_message": str(e)}, safe=False)
+#             except Exception as err:
+#                 print(err)
+#                 return JsonResponse({"result": False, "status_message": err}, safe=False)
+#
+#         elif request.POST.get("in_go") == "create":
+#             try:
+#
+#                 new_role = Role.objects.create(
+#                     devices=dev,
+#                     name=eD(request.POST.get("name", ""))
+#                 )
+#
+#                 new_role.save()
+#                 return JsonResponse({"result": True, "new_role_id": new_role.pk})
+#
+#                 # return JsonResponse({"result": True}, safe=False)
+#
+#             except IntegrityError as e:
+#                 return JsonResponse({"result": False, "status_message": "Bu  cihaz adı daha önce tanımlanmış"},
+#                                     safe=False)
+#             except Exception as err:
+#                 return JsonResponse({"result": False, "status_message": err}, safe=False)
 
 
 def eD(val):
     return str(val).strip().lower()
 
+
 @csrf_exempt
 def Apis(request):
-
-    print("----------",request.headers["Api-Key"])
+    print("----------", request.headers["Api-Key"])
     print("----------", request.headers["Data"])
 
     return JsonResponse(

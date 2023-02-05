@@ -17,7 +17,7 @@ class UserAdmin(BaseUserAdmin):
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
-    list_display = ('username', 'is_admin', 'is_staff')
+    list_display = ('username', 'is_admin', 'is_salesman')
     list_filter = ('account',)
     fieldsets = (
         (None, {'fields': ('username', 'password',)}),
@@ -29,7 +29,7 @@ class UserAdmin(BaseUserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('name', 'username',  'password1', 'password2', 'account'),
+            'fields': ('name', 'username',  'password1', 'password2'),
         }),
     )
     search_fields = ('username',)
@@ -62,11 +62,9 @@ class AccountsAdmin(admin.TabularInline):
 
 @admin.register(Account)
 class AccountAdmin(admin.ModelAdmin):
-    fields = ('name', 'related_person_name',
-              'phone', 'licence_date')
+    fields = ('name',  'phone', 'licence_date')
 
-    list_display = ('name',
-                    'related_person_name', 'licence_date', 'license_status')
+    list_display = ( 'name', 'licence_date', 'license_status')
     list_editable = ("license_status",)
 
     list_filter = (

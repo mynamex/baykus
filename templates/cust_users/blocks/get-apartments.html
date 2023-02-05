@@ -1,0 +1,192 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{#{% block title %} Tables {% endblock title %}#}
+
+
+{% block content %}
+
+    <div class="header bg-primary pb-6">
+        <div class="container-fluid">
+            <div class="header-body">
+                <!-- Card stats -->
+                <div class="row">
+                    <div class="col-md-12 col-xl-12 col-sm-12 ">
+                        <div class="card card-stats">
+                            <!-- Card body -->
+                            <div class="card">
+                                <div class="col-md-8 p-2 ">
+                                </div>
+
+                                <div class="table-responsive"   id="id_card_header_right">
+
+                                    <table class="table align-items-center" id="id_table_apartment_info">
+                                        <thead class="thead-light" style="background-color: #1c1c1c">
+                                        <tr>
+                                            <th scope="col" class="sort" data-sort="name">Yerleşke adı</th>
+                                            <th scope="col" class="sort" data-sort="status">son gözükme</th>
+                                            <th scope="col" class="sort" data-sort="status">adres</th>
+                                            <th scope="col"></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody class="list">
+
+                                        {% for d_apartment in d_aparts %}
+
+                                            <tr>
+                                                <th scope="row">
+                                                    <div class="media align-items-center">
+                                                        <a href="#" class="avatar rounded-circle mr-3" id="td_img"></a>
+                                                        <div class="media-body">
+                                                        <span id="id_owner_name"
+                                                              class="name mb-0 text-sm text-capitalize">{{ d_apartment.name }}</span>
+                                                        </div>
+                                                    </div>
+                                                </th>
+
+
+{#                                                <td>#}
+{#                                                <span class="badge badge-dot mr-4">#}
+{#                                                  <i id="td_i_clor" class="bg-orange"></i>#}
+{#                                                  <span id="t_ap_status" class="status text-capitalize"></span>#}
+{#                                                </span>#}
+{#                                                </td>#}
+
+                                                <td>
+                                                <span class="badge badge-dot mr-4">
+                                                  <i class="bg-blue"></i>
+                                                  <span id="t_its_self" class="status text-capitalize">{{ d_apartment.device_last_online_date }}</span>
+                                                </span>
+                                                </td>
+
+                                                <td class="budget text-capitalize">
+                                                    <span id="t_address" class="status text-capitalize">{{ d_apartment.address }}</span>
+                                                </td>
+
+                                                <td class="text-right">
+                                                    <div class="dropdown">
+                                                        <a class="btn btn-sm btn-icon-only text-light"
+                                                           href="javascript:go_ask({{ d_apartment.id }});"
+                                                           role="button"
+
+                                                           aria-expanded="false">
+                                                            <i class="fas fa-ellipsis-v"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        {#                        {% include 'cust_users/blocks/create_family.html' %}#}
+                        {#                        {% include 'cust_users/blocks/create_owner.html' %}#}
+                        {#                     {% include 'cust_users/blocks/edit_owner.html' %}#}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {#    ------------------------------------------------ Cart Bottom --------------------------------------------------#}
+
+    <div class="container-fluid mt--6 p-0" id="id_card_bottom">
+        <div class="card">
+            <div class="card-header card-header-icon">
+                <div class="card-icon">
+                    <i class="ni ni-building text-yellow"></i>
+                    <span class="nav-link-text text-white">Yerleşke bilgileri</span>
+                </div>
+
+            </div>
+                <div class="card-body">
+            </div>
+        </div>
+    </div>
+
+
+
+
+{% endblock content %}
+
+{% block javascripts %}
+
+    <script>
+        {#-----------------------------------arka sil orayı--------------------------------------------------------#}
+
+        function go_ask(ap_id) {
+            console.log("geldim", ap_id)
+        }
+
+        function change_color_to_orange(val) {
+            val.removeClass('bg-green')
+            val.addClass('bg-orange')
+
+        }
+
+        function change_color_to_green(val) {
+            val.removeClass('bg-orange')
+            val.addClass('bg-green')
+        }
+
+        function clear_complement() {
+        }
+
+        function empty_apartment_to_do() {
+        }
+
+
+        function get_apartment_info() {
+        }
+
+        $(function () {
+            {# blok seç#}
+            $("#select_blocks").change(function (e) {
+                e.preventDefault();
+
+                clear_complement();
+
+                let block_id = $(this).children("option:selected").val();
+                $("#select_apartment").empty().append('<option value = "">Seç</option>');
+
+                if (block_id) {
+                    $.ajax({
+                        type: 'GET',
+                        url: "{% url 'get_apartments' %}",
+                        data: {"block_id": block_id},
+                        success: function (response) {
+                            // if not valid user, alert the user
+                            console.log(response)
+
+                            if (response["success"]) {
+                                const select_apartment = $("#select_apartment");
+                                let options = '';
+                                const array = response.apartments.sort()
+                                array.forEach(ap => {
+                                    options += '<option value=' + ap.id + '>' + ap.name + '</option>';
+                                })
+                                select_apartment.append(options);
+                            } else MyToastWarn("blok eşleşmedi");
+                        },
+                        error: function (response) {
+                            MyToastError(response)
+                        }
+                    })
+                } else console.log("seçiniz")
+            });
+            {# daire seç#}
+            $("#select_apartment").change(function (e) {
+                e.preventDefault();
+                family_id = null;
+                is_get_family = null;
+                apartment_id = $("#select_apartment").children("option:selected").val();
+                get_apartment_info()
+            });
+        });
+    </script>
+{% endblock %}
+

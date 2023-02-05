@@ -1,0 +1,539 @@
+{% extends 'layouts/../layouts/base.html' %}
+
+{% block title %} Dashboard {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <!-- Header -->
+    <div class="header bg-primary pb-6">
+        <div class="container-fluid">
+            <div class="header-body">
+                {#                <div class="row align-items-center py-4">#}
+                {#                    <div class="col-lg-6 col-7">#}
+                {#                    </div>#}
+                {#                    <div class="col-lg-6 col-5 text-right">#}
+                {#                        <p>"hellos</p>#}
+                {#                    </div>#}
+                {#                </div>#}
+                <!-- Card stats -->
+                <div class="row">
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card card-stats">
+                            <!-- Card body -->
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Giriş Kapıları</h5>
+                                        <span id="id_gates_count" class="h2 font-weight-bold  text-white mb-0"></span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-gradient-orange text-white rounded-circle shadow">
+                                            <i class="ni ni-chart-pie-35"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="mt-3 mb-0 text-sm">
+                                    <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> </span>
+                                    <span class="text-nowrap"></span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card card-stats">
+                            <!-- Card body -->
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Blok</h5>
+                                        <span class="h2 font-weight-bold text-white mb-0" id="id_blocks_count"></span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-gradient-green text-white rounded-circle shadow">
+                                            <i class="ni ni-money-coins"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="mt-3 mb-0 text-sm">
+                                    <span class="text-success mr-2"><i class="fa fa-arrow-up"></i></span>
+                                    <span class="text-nowrap" style="color:#8898aa" >Bu sitedeki blok sayısı</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card card-stats">
+                            <!-- Card body -->
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Daireler</h5>
+                                        <span id="id_apartment_count" class="h2 font-weight-bold text-white mb-0"></span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-gradient-info text-white rounded-circle shadow">
+                                            <i class="ni ni-chart-bar-32"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="mt-3 mb-0 text-sm">
+                                    <span class="text-success mr-2" id="id_apartment_avg"><i class="fa fa-arrow-up"></i> 3.48%</span>
+                                    <span class="text-nowrap " style="color:#8898aa" >Doluluk oranı</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page content -->
+    <div class="container-fluid mt--6">
+        <div class="row">
+            <div class="col-xl-8">
+                <div class="card bg-default">
+                    <div class="card-header bg-transparent">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h6 class="text-light text-uppercase ls-1 mb-1">30 günlük kayıtlar gösterilmektedir</h6>
+                                <h5 class="h3 text-white mb-0">Giriş Trafiği</h5>
+                            </div>
+                            <div class="col">
+                                <ul class="nav nav-pills justify-content-end">
+                                    {#                                    <a href="javascript:go_get_answer_chart_data()" class="nav-link py-2 px-3" >#}
+                                    {#                                        <span class="d-none d-md-block">Yenile 4</span>#}
+                                    {#                                    </a>#}
+                                    <a href="javascript:go_get_answer_chart_data()" class="btn btn-sm btn-primary">Yenile</a>
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- Chart -->
+                        <canvas id="chart-sales-dark1" class="chart-canvas" data-value=""></canvas>
+                    </div>
+                </div>
+            </div>
+            <!-- Giriş trafic -->
+            <div class="col-xl-4">
+                <div class="card">
+                    <div class="card-header border-0">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h6 class="text-light text-uppercase ls-1 mb-1">30 günlük kayıt</h6>
+                                <h3 class="mb-0 text-white" id="id_sum_traffic"></h3>
+                            </div>
+                            <div class="col text-right">
+                                <a href="javascript:go_get_reason_chart_data()" class="btn btn-sm btn-primary">Yenile</a>
+                            </div>
+
+                            {#                             <div class="col text-right">#}
+                            {#                                <a href="javascript:go_test()" class="btn btn-sm btn-primary">test</a>#}
+                            {#                            </div>#}
+
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <!-- Projects reason -->
+                        <table class="table align-items-center table-flush"  id="id_table_reason">
+                            <thead class="" style="background-color: #1c1c1c" >
+                            <tr >
+                                <th scope="col">Ziyaret Sebebi</th>
+                                <th scope="col">Ziyaret Sayısı</th>
+                                <th scope="col">Avaraj</th>
+                            </tr>
+                            </thead>
+                            <tbody id="id_tbody_reason">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xl-8">
+                <div class="card">
+                    <div class="card-header border-0">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h3 class="mb-0 text-white ">Bloklara Göre Ziyaretler</h3>
+                            </div>
+                            <div class="col text-right">
+                                <a href="javascript:go_get_blocks_chart_data()" class="btn btn-sm btn-primary">Yenile</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <!-- Projects Block Count -->
+                        <table class="table align-items-center table-flush" id="id_table_blocks">
+                            <thead class="" style="background-color: #1c1c1c">
+                            <tr>
+                                <th scope="col">Bloklar</th>
+                                <th scope="col">Boş daire</th>
+                                <th scope="col">Dolu daire</th>
+                                <th scope="col">Doluluk oranı</th>
+                            </tr>
+                            </thead>
+                            <tbody id="id_tbody_blocks">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% include "includes/../includes/footer.html" %}
+    </div>
+
+{% endblock content %}
+
+<!-- Specific JS goes HERE -->
+{% block javascripts %}
+
+    <script src="/static/assets/vendor/chart.js/dist/Chart.min.js"></script>
+
+    <script>
+        let info_box = {
+            init:function (){
+                $.ajax({
+                    type: 'post',
+                    {#url: "{% url 'visitors:get_chart_data' %}",#}
+                    data: {"go_to": "all_chart_data",
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function (response) {
+                        const {success} =response
+                        if (success) {
+                            const {data} =response
+                            info_box.values.filter.reason_chart_data = data["reason_data"]
+                            info_box.values.filter.answer_chart_data = data["answer_data"]
+                            info_box.values.filter.blocks_chart_data = data["blocks_data"]
+
+                            info_box.values.filter.gates_count = data["gates_count"]
+                            info_box.values.filter.apartments_count = data["apartments_count"]
+                            info_box.values.filter.blocks_count = data["blocks_data"].length
+
+                            info_box.values.filter.chart_last_time = Date.now();
+
+                            localStorage.setItem('chart_data', JSON.stringify(info_box.values));
+
+                            set_default_data()
+
+                        } else MyToastInfo("chart data çekilirken bir hata oluştu");
+                    },
+                    error: function (response) {
+                       MyToastError(response)
+                    }
+                })
+            },
+            re_set:function (){
+                const chart_data =  JSON.parse(localStorage.getItem('chart_data'))
+
+                info_box.values.filter.reason_chart_data = chart_data.filter.reason_chart_data
+                info_box.values.filter.answer_chart_data = chart_data.filter.answer_chart_data
+                info_box.values.filter.blocks_chart_data = chart_data.filter.blocks_chart_data
+
+                info_box.values.filter.gates_count = chart_data.filter.gates_count
+                info_box.values.filter.apartments_count = chart_data.filter.apartments_count
+                info_box.values.filter.blocks_count = chart_data.filter.blocks_count
+
+                set_default_data()
+
+            },
+            values: {
+                filter :{
+                    reason_chart_data: null,
+                    answer_chart_data: null,
+                    blocks_chart_data:null,
+                    chart_last_time:null,
+
+                    gates_count:null,
+                    apartments_count:null,
+                    blocks_count:null,
+                }
+            }
+        }
+
+        $(function(){
+            const chart_data =  JSON.parse(localStorage.getItem('chart_data'))
+
+            if (chart_data){
+                const millis = Date.now() - chart_data.filter.chart_last_time;
+                const passing_time = Math.floor(millis / 1000)
+                console.log("geçen zaman", passing_time)
+                if (passing_time>100){
+                    info_box.init();
+                }else {
+
+                    info_box.re_set()
+                }
+
+            }else {
+                info_box.init();
+            }
+
+        });
+
+        function set_default_data() {
+            set_answer_chart()
+            set_reason_chart()
+            set_blocks_chart()
+
+            $("#id_gates_count").text(info_box.values.filter.gates_count)
+            $("#id_apartment_count").text(info_box.values.filter.apartments_count)
+            $("#id_blocks_count").text(info_box.values.filter.blocks_count)
+        }
+
+        /*function go_anime() {
+            info_box.values.filter.reason_chart_data.forEach(function (x, i) {
+                const avg = Math.round(x.ap_data.res_count *100 / x.ap_data.sum_count)
+                $("#id_p_"+i).css('width', 0+'%');
+                {#delay(1000).then(() => {$("#id_p_"+i).css('width', avg+'%')});#}
+            })
+            set_answer_chart()
+            {#delay(20000).then(() =>  go_anime());#}
+        }*/
+
+        function go_get_reason_chart_data() {
+
+            $.ajax({
+                type: 'post',
+                {#url: "{% url 'visitors:get_chart_data' %}",#}
+                data: {"go_to": "reason_chart_data",
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function (response) {
+                    const {success} =response
+                    if (success) {
+                        const {data} =response
+
+                        info_box.values.filter.reason_chart_data = data["reason_data"]
+                        let existing = localStorage.getItem('chart_data')
+                        existing = existing ? JSON.parse(existing) : {};
+                        existing['filter'].reason_chart_data = data["reason_data"];
+                        localStorage.setItem('chart_data', JSON.stringify(existing))
+
+                        set_reason_chart()
+
+                    } else MyToastInfo("Ziyaret Sebebleri okunamadı");
+                },
+                error: function (response) {
+                    MyToastError(response)
+                }
+            })
+        }
+
+        function go_get_answer_chart_data() {
+            $.ajax({
+                type: 'post',
+                {#url: "{% url 'visitors:get_chart_data' %}",#}
+                data: {"go_to": "answer_chart_data",
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function (response) {
+                    const {success} =response
+                    if (success) {
+                        const {data} =response
+
+                        info_box.values.filter.answer_chart_data = data["answer_data"]
+
+                        let existing = localStorage.getItem('chart_data')
+                        existing = existing ? JSON.parse(existing) : {};
+                        existing['filter'].answer_chart_data = data["answer_data"];
+                        localStorage.setItem('chart_data', JSON.stringify(existing))
+
+                        set_answer_chart()
+
+                    } else MyToastWarn("Ziyaret cevapları okunamadı");
+                },
+                error: function (response) {
+                    MyToastError(response)
+                }
+            })
+        }
+
+        function go_get_blocks_chart_data() {
+            $.ajax({
+                type: 'post',
+                {#url: "{% url 'visitors:get_chart_data' %}",#}
+                data: {"go_to": "blocks_chart_data",
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function (response) {
+                    const {success} =response
+                    if (success) {
+                        const {data} =response
+
+                        info_box.values.filter.blocks_chart_data = data["blocks_data"]
+                        let existing = localStorage.getItem('chart_data')
+                        existing = existing ? JSON.parse(existing) : {};
+                        existing['filter'].blocks_chart_data = data["blocks_data"];
+                        localStorage.setItem('chart_data', JSON.stringify(existing))
+
+                        set_blocks_chart()
+
+                    } else MyToastWarn("Blok dataları okunamadı");
+                },
+                error: function (response) {
+                    MyToastError(response)
+                }
+            })
+        }
+
+        function addData(chart,text,  data) {
+            chart.options.title.text = "Bu ayki toplam giriş sayısı : " + text
+            chart.data.labels=["Kabul Edilen", "Reddilen", "Ulaşılmadı"]
+            chart.data.datasets=[{
+                label: "counter",
+                backgroundColor: ["#3ac876", "#d03636","orange"], // "#3e95cd" "#e8c3b9","#c45850"
+                data: data
+            }]
+            chart.update();
+        }
+
+        function removeData(chart) {
+            chart.data.labels=[];
+            chart.data.datasets =[]
+            chart.update();
+        }
+
+        function set_answer_chart(){
+            const labels = []
+            const dat = []
+            let count =0
+            info_box.values.filter.answer_chart_data.forEach((val, index) => {
+                count+= val.ap_data
+                labels.push(val.answer_name)
+                dat.push(val.ap_data)
+
+            });
+            $("#id_sum_traffic").text(count + " Kayıt yapılmıştır")
+            removeData(barChart)
+            addData(barChart, count, dat)
+        }
+
+        function set_reason_chart(){
+            $("#id_tbody_reason").empty();
+            info_box.values.filter.reason_chart_data.forEach(function (x, i) {
+                const avg = Math.round(x.ap_data.res_count *100 / x.ap_data.sum_count)?Math.round(x.ap_data.res_count *100 / x.ap_data.sum_count):0
+
+                let color = ""
+                switch(true) {
+                    case avg < 40:
+                        color = "bg-gradient-green"
+                        break;
+                    case avg < 60:
+                        color = "bg-gradient-green"
+                        break;
+                    case avg < 80:
+                        color = "bg-gradient-orange"
+                        break;
+                    case avg < 10:
+                        color = "bg-gradient-blue"
+                        break;
+
+                    default:
+                        color = "bg-gradient-gray"
+
+                    // code to be executed if n is different from case 1 and 2
+                }
+
+                $('#id_table_reason').append(`<tr><td class="budget text-capitalize" style="color:#8898aa">${x.reason_name}</td><td class="budget text-capitalize text-orange" >${x.ap_data.res_count}</td><td class="budget text-capitalize"><div class="d-flex align-items-center"><span class="mr-2 text-cyan">${avg}%</span><div><div class="progress"><div id="id_p_${i}" class="progress-bar ${color}"role="progressbar" aria-valuenow=70 aria-valuemin="0" aria-valuemax="100" style="width:${avg}%;"></div></div></div></div></td></tr>`);
+            })
+        }
+
+        function set_blocks_chart(){
+            $("#id_tbody_blocks").empty()
+            let sum_full = 0
+            let sum_empy = 0
+            let empty_color = "text-green"
+            let full_color = "text-green"
+
+            info_box.values.filter.blocks_chart_data.forEach(function (x, i) {
+                // Adding a row inside the tbody.
+                sum_full += x.ap_data.full
+                sum_empy += x.ap_data.emp
+
+
+                const avg = x.ap_data.full *100 / x.ap_data.emp
+                let color = ""
+                switch(true) {
+                    case avg < 40:
+                        color = "bg-gradient-green"
+                        full_color="text-green"
+                        break;
+                    case avg < 60:
+                        color = "bg-gradient-purple"
+                        full_color="text-purple"
+                        break;
+                    case avg < 80:
+                        color = "bg-gradient-orange"
+                        full_color="text-orange"
+                        break;
+                    case avg < 90:
+                        color = "bg-gradient-blue"
+                        full_color="text-blue"
+                        break;
+
+                    case avg > 90:
+                        color = "bg-gradient-red"
+                        full_color="text-red"
+                        break;
+
+                    default:
+                        color = "bg-gradient-gray"
+
+                    // code to be executed if n is different from case 1 and 2
+                }
+
+                if (x.ap_data.emp-x.ap_data.full<1)
+                    empty_color = "text-red"
+                else if (x.ap_data.emp-x.ap_data.full<5)
+                    empty_color = "text-yellow"
+                else if (x.ap_data.emp-x.ap_data.full<10)
+                    empty_color = "text-blue"
+                else if (x.ap_data.emp-x.ap_data.full<15)
+                    empty_color = "text-green"
+
+
+
+                $('#id_table_blocks').append(`<tr><td class="budget text-capitalize te" style="color:#8898aa">${x.name}</td><td class="budget text-capitalize ${empty_color}">${x.ap_data.emp-x.ap_data.full}</td><td class="budget text-capitalize ${full_color}"  >${Math.round(x.ap_data.full)}</td><td class="budget text-capitalize"><div class="d-flex align-items-center"><span class="mr-2 text-cyan">${Math.round(avg)?Math.round(avg):0}%</span><div><div class="progress"><div id="id_p_${i}" class="progress-bar ${color}" role="progressbar" aria-valuenow=70 aria-valuemin="0" aria-valuemax="100" style="width:${avg}%;"></div></div></div></div></td></tr>`);
+            })
+
+            $("#id_apartment_avg").text( Math.round(sum_full* 100/sum_empy)+"%")
+        }
+
+        const barChart = new Chart(document.getElementById("chart-sales-dark1"), {
+            type: 'doughnut',
+            data: {
+                labels: ["Kabul Edilen", "Reddilen", "Ulaşılmadı"],
+                datasets: [{
+                    label: "counter",
+                    backgroundColor: ["#3ac876", "#d03636","orange"], // "#e8c3b9","#c45850"
+                    data: [1,1,1]
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Bu ay giriş analizi'
+                }
+            }
+        });
+
+        /*setTimeout(function() {
+            go_anime()
+        }, 5000);*/
+
+        function delay(time) {
+            return new Promise(resolve => setTimeout(resolve, time));
+        }
+    </script>
+
+
+{% endblock javascripts %}

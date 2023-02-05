@@ -45,6 +45,7 @@ class MyUser(AbstractBaseUser):
     account = models.ForeignKey('accounts.Account', null=True, related_name="myuser", on_delete=models.SET_NULL)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
+    is_salesman = models.BooleanField(default=False)
 
     objects = MyUserManager()
     USERNAME_FIELD = 'username'

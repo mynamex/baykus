@@ -1,5 +1,4 @@
 from django import forms
-from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.exceptions import ValidationError
 
 from apps.customauth.models import MyUser
@@ -13,7 +12,7 @@ class UserCreationForm(forms.ModelForm):
 
     class Meta:
         model = MyUser
-        fields = ('username', 'password1', 'password2',)
+        fields = ('username', 'password1', 'password2', 'role', 'is_person',)
 
     def clean_password2(self):
         # Check that the two password entries match
@@ -26,7 +25,6 @@ class UserCreationForm(forms.ModelForm):
     def save(self, commit=True):
         # Save the provided password in hashed format
         user = super().save(commit=False)
-        user.is_salesman = True
         user.set_password(self.cleaned_data["password1"])
         if commit:
             user.save()
@@ -38,20 +36,19 @@ class UserChangeForm(forms.ModelForm):
     the user, but replaces the password field with admin's
     password hash display field.
     """
-    password = ReadOnlyPasswordHashField()
 
     class Meta:
         model = MyUser
-        fields = ('name', 'username',)
+        fields = ('name', 'username', 'is_active')
 
-    def clean_password(self):
-        # Regardless of what the user provides, return the initial value.
-        # This is done here, rather than on the field, because the
-        # field does not have access to the initial value
-        return self.initial["password"]
+    # def clean_password(self):
+    #     # Regardless of what the user provides, return the initial value.
+    #     # This is done here, rather than on the field, because the
+    #     # field does not have access to the initial value
+    #     return self.initial["password"]
 
 
 class ShowAccountUserForm(forms.ModelForm):
     class Meta:
         model = MyUser
-        fields = ('name', 'username',)
+        fields = ('name', 'username',  'role', 'is_active')
