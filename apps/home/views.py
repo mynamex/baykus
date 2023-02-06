@@ -206,6 +206,7 @@ class WatchCampus(View):
 
         return JsonResponse({"success": self.success, "data": self.data})
 
+
 def eD(val):
     return str(val).strip().lower()
 
