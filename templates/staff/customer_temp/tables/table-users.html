@@ -64,13 +64,11 @@
                 onItemInserting: function (args) {
                     const person_name_is_unique =  $("#jsGridUsers").jsGrid("option", "data").find(x => x.name ===args.item.name)
 
-
                     if (person_name_is_unique){
                             MyToastWarn("Bu isimde birisi zaten var")
                          args.cancel = true;
                          return
                     }
-
 
                     $.ajax({
                         method: 'POST', dataType: "json", async: false,

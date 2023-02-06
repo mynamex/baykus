@@ -184,13 +184,13 @@
                 fields: [
                     {name: "pk", title: "Id", type: "number", width: 40 ,visible: false},
                     {name: "key", title: "key", type: "text", width: 71, validate: function(value, item) {
-                            console.log(item.key.length > 1 && item.key.length < 10)
+
                         return item.key.length > 0 && item.key.length < 10}},
                       {
                         name: "device_type", width: 110, title: "Cihaz tipi", type: "select", selectedIndex: 0,
                         items: [
-                            {Name: "Role", Id: "role"},
-                            {Name: "Sensor", Id: "sens"},
+                            {Name: "Output", Id: "output"},
+                            {Name: "Input", Id: "input"},
                         ], valueField: "Id", textField: "Name", validate: function (value, item) {
                             return item.device_type;
                         }

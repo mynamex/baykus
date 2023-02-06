@@ -228,11 +228,6 @@ def ShowCampus(request, pk_customer):
     return render(request, 'staff/customer_temp/customer.html', context)
 
 
-
-
-# --------------------------------------------------------------------------------------------------------
-# -----------------  Daire ---------------Daire------------------Daire-----------------Daire-------------
-# --------------------------------------------------------------------------------------------------------
 @method_decorator(my_decorators, name='dispatch')
 class StaffCampusView(View):
     def __init__(self, **kwargs):
@@ -404,7 +399,6 @@ class DevicesView(View):
 
                     self.data["desc"] = "cihaz güncellendi"
 
-
                 elif request.POST.get("in_go") == "create":
                     new_device = Devices.objects.create(
 
@@ -415,7 +409,7 @@ class DevicesView(View):
                     )
 
                     new_device.save()
-                    apartment.device.add(new_device)
+                    apartment.devices.add(new_device)
 
                     self.data["desc"] = "Yeni bir cihaz yaratıldı"
                     self.data["new_devices_id"] = new_device.pk

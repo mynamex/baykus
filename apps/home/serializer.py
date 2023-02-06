@@ -42,5 +42,6 @@ class DevicesSerializer(serializers.ModelSerializer):
                   "label",
                   ]
 
-
+        order_by = (
+            ('device_type', 'name'))
 

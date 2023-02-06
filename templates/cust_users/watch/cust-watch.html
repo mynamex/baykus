@@ -30,19 +30,19 @@
                         <div class="table-responsive" id="id_info_apartment">
                             <ul id="id_ul_list" class="list-group">
                                 {% for x in d_devices %}
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <li class="list-group-item d-flex justify-content-between  align-items-center">
                                     {% if x.device_type == "output" %}
                                         {% if "buzzer" in x.key %}
                                             {% if x.status %}
                                                 <span class="material-icons text-yellow">volume_up</span>
                                                 <span class="status text-capitalize">{{ x.name }}</span>
                                                 <a type="button" class="btn btn-danger"
-                                                   href="javascript:go_ask({{ x.pk }})">Kapat</a>
+                                                   href="javascript:go_ask({{ x.pk }})">Off</a>
                                             {% else %}
                                                 <span class="material-icons text-gray-dark">volume_off</span>
                                                 <span class="status text-capitalize">{{ x.name }}</span>
                                                 <a type="button" class="btn btn-info"
-                                                   href="javascript:go_ask({{ x.pk }})">Aç</a>
+                                                   href="javascript:go_ask({{ x.pk }})">On</a>
                                             {% endif %}
 
                                         {% elif "flash_light" in x.key %}
@@ -50,12 +50,12 @@
                                                 <span class="material-icons text-yellow">flash_on</span>
                                                 <span class="status text-capitalize">{{ x.name }}</span>
                                                 <a type="button" class="btn btn-danger"
-                                                   href="javascript:go_ask({{ x.pk }})">Kapat</a>
+                                                   href="javascript:go_ask({{ x.pk }})">Off</a>
                                             {% else %}
                                                 <span class="material-icons text-gray-dark">flash_off</span>
                                                 <span class="status text-capitalize">{{ x.name }}</span>
                                                 <a type="button" class="btn btn-info"
-                                                   href="javascript:go_ask({{ x.pk }})">Aç</a>
+                                                   href="javascript:go_ask({{ x.pk }})">On</a>
                                             {% endif %}
 
                                         {% elif "alarm" in x.key %}
@@ -63,12 +63,12 @@
                                                 <span class="material-icons text-red">notifications_active</span>
                                                 <span id="t_its_self" class="status text-capitalize">{{ x.name }}</span>
                                                 <a type="button" class="btn btn-danger"
-                                                   href="javascript:go_ask({{ x.pk }})">Kapat</a>
+                                                   href="javascript:go_ask({{ x.pk }})">Off</a>
                                             {% else %}
                                                 <span class="material-icons text-gray-dark">notifications_off</span>
                                                 <span class="status text-capitalize">{{ x.name }}</span>
                                                 <a type="button" class="btn btn-info"
-                                                   href="javascript:go_ask({{ x.pk }});">Aç</a>
+                                                   href="javascript:go_ask({{ x.pk }});">On</a>
                                             {% endif %}
                                         {% endif %}
                                         <!-- sensor -->
@@ -178,42 +178,42 @@
                             icon = "volume_up"
                             icon_color = "text-yellow"
                             button_color = "btn btn-danger"
-                            button_text = "Kapat"
+                            button_text = "Off"
                         } else {
                             icon = "volume_off"
                             icon_color = "text-gray-dark"
                             button_color = "btn btn-info"
-                            button_text = "Aç"
+                            button_text = "On"
                         }
                     } else if (x.key.includes("flash_light")) {
                         if (x.status) {
                             icon = "flash_on"
                             icon_color = "text-yellow"
                             button_color = "btn btn-danger"
-                            button_text = "Kapat"
+                            button_text = "Off"
                         } else {
                             icon = "volume_up"
                             icon_color = "text-gray-dark"
                             button_color = "btn btn-info"
-                            button_text = "Aç"
+                            button_text = "On"
                         }
                     } else if (x.key.includes("alarm")) {
                         if (x.status) {
                             icon = "notifications_off"
                             icon_color = "text-yellow"
                             button_color = "btn btn-danger"
-                            button_text = "Kapat"
+                            button_text = "Off"
                         } else {
                             icon = "notifications_active"
                             icon_color = "text-gray-dark"
                             button_color = "btn btn-info"
-                            button_text = "Aç"
+                            button_text = "On"
                         }
                     }
                     op += `<span class="material-icons ${icon_color}">${icon}</span><span class="status text-capitalize">${x.name ? x.name : "-"}</span><a type="button" class=" ${button_color}" href="javascript:go_ask(${x.pk})" >${button_text}</a>`
                 }
                 else if (x.device_type.includes("input")) {
-                    console.log(x)
+
                     if (x.key.includes("temp")) {
                         if (x.status) {
                             icon = "local_fire_department"
@@ -258,6 +258,8 @@
 
 
         $(function () {
+            go_interval()
+             localStorage.setItem('go_ask_date', JSON.stringify("{{ go_ask_date}}"))
             {# blok seç#}
             $("#select_campus").change(function (e) {
                 e.preventDefault();
@@ -281,6 +283,7 @@
                             const {success} = response
                             if (success) {
                                 go_fill(response.data.d_data)
+                                localStorage.setItem('go_ask_date', JSON.stringify(response.data.go_ask_date))
                             } else {
                                 MyToastWarn(response.data.desc);
                                 args.cancel = true;
@@ -295,5 +298,49 @@
             });
 
         });
+
+
+          function delay(time) {
+            return new Promise(resolve => setTimeout(resolve, time));
+        }
+
+        function go_interval() {
+
+           let selected_ap_id = $("#select_campus").children("option:selected").val();
+
+            if (!selected_ap_id) {
+                selected_ap_id = "{{ first_id}}"
+            }
+
+            $.ajax({
+                type: 'post', async: false, dataType: "json",
+                url: "{% url 'watch_campus' %}",
+
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken")
+                },
+                data: {
+                    "in_go": "go_get",
+                    "ap_id": selected_ap_id,
+                },
+
+                success: function (response) {
+                    const {success} = response
+
+                    if (success) {
+                        go_fill(response.data.d_data)
+
+                    } else {
+                        MyToastWarn(response.data.desc);
+                    }
+                },
+                error: function (response) {
+                    MyToastError(response)
+                }
+            })
+            delay(20000).then(() =>  go_interval());
+        }
+
+
     </script>
 {% endblock %}

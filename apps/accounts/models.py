@@ -44,6 +44,8 @@ class Apartments(models.Model):
     wifi_name = models.CharField(max_length=50, null=True)
     wifi_pass = models.CharField(max_length=20, null=True)
 
+    alarm_on = models.BooleanField(default=False)
+
     is_active = models.BooleanField(default=True)
     data_created = models.DateTimeField(auto_now=True, null=True)
 
@@ -52,6 +54,8 @@ class Apartments(models.Model):
     # device = models.OneToOneField("Devices", on_delete=models.CASCADE, related_name="apartments")
 
     devices = models.ManyToManyField("Devices", related_name="devices_apartments")
+
+    go_ask_date = models.DateTimeField(auto_now=True, null=True)
 
     class Meta:
         unique_together = (('account', 'name'), ("api_key",))
