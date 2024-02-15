@@ -414,7 +414,6 @@ class DevicesView(View):
                     self.data["desc"] = "Yeni bir cihaz yaratıldı"
                     self.data["new_devices_id"] = new_device.pk
 
-
         except IntegrityError as e:
             if str(e).__contains__("UNIQUE"):
                 if str(e).__contains__("accounts_device.key"):

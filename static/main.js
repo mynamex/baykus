@@ -20,9 +20,21 @@ jQuery(function ($){
  // let loading = ` <div class="spinner-border"> <div/>&nbsp;&nbsp; Please wait..`
 $(document).ajaxSend(function(event, jqXHR, ajaxSettings, thrownError){
 
-      // console.log("ajaxSend",ajaxSettings.data);
-      if (!ajaxSettings.data.includes("go_get"))
-        $("#bg-spinner").fadeIn(250);
+        if (ajaxSettings.data && ajaxSettings.data.includes("go_get")){
+             console.log("go_get")
+        }else {
+             $("#bg-spinner").fadeIn(250);
+        }
+
+
+
+      // if (Array.isArray(ajaxSettings.data) && !ajaxSettings.data.length){
+      //
+      //      $("#bg-spinner").fadeIn(250);
+      // }
+
+     // if (!ajaxSettings.data.includes("go_get"))
+
 });
 $(document).ajaxComplete(function(){
     $("#bg-spinner").fadeOut(250);

@@ -1,59 +1,9 @@
-
-     <div id="jsGridDevices"></div>
-
-{#    <div class="col-xl-6 col-md-6 col-sm-12">#}
-{#        <div class="card">#}
-{#            <div class="card-header border-0">#}
-{#                <div class="row align-items-center">#}
-{#                    <div class="col">#}
-{#                        <h3 class="mb-0 text-white" id="id_label_ap_name">Cihazlarım</h3>#}
-{#                    </div>#}
-{#                    <div class="col text-right">#}
-{##}
-{#                    </div>#}
-{#                </div>#}
-{#            </div>#}
-{#            <div class="table-responsive">#}
-{#                <!-- Projects table -->#}
-{#               <div id="jsGridDevices"></div>#}
-{##}
-{#            </div>#}
-{#        </div>#}
-{#    </div>#}
-
-{#    <div class="col-xl-6 col-md-6 col-sm-12">#}
-{#        <div class="card">#}
-{#            <div class="card-header border-0">#}
-{#                <div class="row align-items-center">#}
-{##}
-{#                    <div class="col text-right">#}
-{##}
-{#                         <h3 class="mb-0" id="id_label_device_name">Röleler</h3>#}
-{#                    </div>#}
-{#                </div>#}
-{#            </div>#}
-{#            <div class="table-responsive">#}
-{#                <!-- Projects table -->#}
-{#                <div class="col" id="roleContainer" style=" visibility: hidden">#}
-{#                     {% include 'staff/customer_temp/tables/table-roles.html' %}#}
-{#                    <div id="jsGridRoles"></div>#}
-{#                </div>#}
-{##}
-{#            </div>#}
-{#        </div>#}
-{#    </div>#}
-
-
-
-
-
+<div id="jsGridDevices"></div>
 
 {% block javascripts %}
-
     <script>
         $(document).ready(function () {
-
-          $("#jsGridDevices").jsGrid({
+            $("#jsGridDevices").jsGrid({
                 width: "100%",
                 height: "350px",
                 inserting: true,
@@ -68,44 +18,36 @@
                         let d = $.Deferred();
                         $.ajax({
                             method: 'GET',
-                            url:"{% url 'staff_me:devices_view' %}",
+                            url: "{% url 'staff_me:devices_view' %}",
                             dataType: "json",
                             data: {
-                                "ap_id":ap_id,
+                                "ap_id": ap_id,
                                 "account_id":{{ customer.pk }},
                                 "csrfmiddlewaretoken": '{{ csrf_token }}'
                             }, success: function (response) {
-                            const {success} = response
-
-                            if (success) {
-                                const {data} = response
-                                 d.resolve(data.d_data);
-
-                            } else {
-                                MyToastWarn(response.data.desc);
-
+                                const {success} = response
+                                if (success) {
+                                    const {data} = response
+                                    d.resolve(data.d_data);
+                                } else {
+                                    MyToastWarn(response.data.desc);
+                                }
+                            },
+                            error: function (err) {
+                                MyToastError(err);
                             }
-
-                        },
-                        error: function (err) {
-                            MyToastError(err);
-
-                        }})
-
+                        })
                         return d.promise();
                     }
                 },
 
                 onItemInserting: function (args) {
-
                     $.ajax({
-                        method: 'POST', dataType: "json", async:false,
-                        url:"{% url 'staff_me:devices_view' %}",
-
+                        method: 'POST', dataType: "json", async: false,
+                        url: "{% url 'staff_me:devices_view' %}",
                         data: {
-                            "in_go":"create",
-                            "ap_id":ap_id,
-
+                            "in_go": "create",
+                            "ap_id": ap_id,
                             "key": args.item.key,
                             "device_type": args.item.device_type,
                             "name": args.item.name,
@@ -113,20 +55,20 @@
                             "is_active": args.item.is_active,
                             "csrfmiddlewaretoken": '{{ csrf_token }}'
                         },
-                          success: function (response) {
+                        success: function (response) {
                             const {success} = response
                             if (success) {
                                 const {data} = response
-                                args.item.pk =data.new_devices_id
+                                args.item.pk = data.new_devices_id
                                 args.item.status = true;
                                 MyToastSuccess(data.desc)
                                 $(".jsgrid-insert-mode-button").click()
+
 
                             } else {
                                 MyToastWarn(response.data.desc);
                                 args.cancel = true;
                             }
-
                         },
                         error: function (err) {
                             MyToastError(err);
@@ -137,14 +79,14 @@
                 onItemUpdating: function (args) {
                     $.ajax({
                         method: 'POST',
-                        url:"{% url 'staff_me:devices_view' %}",
+                        url: "{% url 'staff_me:devices_view' %}",
                         dataType: "json",
-                        async:false,
+                        async: false,
                         data: {
-                            "in_go":"update",
-                            "ap_id":ap_id,
+                            "in_go": "update",
+                            "ap_id": ap_id,
                             "dev_id": args.item.pk,
-                             "key": args.item.key,
+                            "key": args.item.key,
                             "device_type": args.item.device_type,
                             "name": args.item.name,
                             "status": args.item.status,
@@ -152,7 +94,7 @@
                             "csrfmiddlewaretoken": '{{ csrf_token }}'
 
                         },
-                          success: function (response) {
+                        success: function (response) {
                             const {success} = response
                             if (success) {
                                 const {data} = response
@@ -163,30 +105,30 @@
                                 MyToastWarn(response.data.desc);
                                 args.cancel = true;
                             }
-
                         },
                         error: function (err) {
                             MyToastError(err);
                             args.cancel = true;
                         }
-
                     })
                 },
                 rowClick: function (args) {
                     {#console.log(args.item.id);#}
-                        $("#roleContainer").css('visibility', 'visible');
-                        device_id = args.item.id
+                    $("#roleContainer").css('visibility', 'visible');
+                    device_id = args.item.id
 
-                         $("#id_label_device_name").text("Role : "+args.item.name);
-                          $("#jsGridRoles").jsGrid("loadData");
-
+                    $("#id_label_device_name").text("Role : " + args.item.name);
+                    $("#jsGridRoles").jsGrid("loadData");
                 },
                 fields: [
-                    {name: "pk", title: "Id", type: "number", width: 40 ,visible: false},
-                    {name: "key", title: "key", type: "text", width: 71, validate: function(value, item) {
+                    {name: "pk", title: "Id", type: "number", width: 40, visible: false},
+                    {
+                        name: "key", title: "key", type: "text", width: 71, validate: function (value, item) {
 
-                        return item.key.length > 0 && item.key.length < 10}},
-                      {
+                            return item.key.length > 0 && item.key.length < 10
+                        }
+                    },
+                    {
                         name: "device_type", width: 110, title: "Cihaz tipi", type: "select", selectedIndex: 0,
                         items: [
                             {Name: "Output", Id: "output"},
@@ -195,12 +137,15 @@
                             return item.device_type;
                         }
                     },
-                    {name: "name", title: "Cihaz adı", type: "text", width: 110,validate: function(value, item) {
-                        return item.name.length > 2 && item.name.length < 15 }},
-                    {name: "status", title:  "Durum", type: "checkbox", width: 80, inserting: false},
-                    {name: "is_active", title:  "Aktif", type: "checkbox", width: 80, inserting: false},
-                    {name: "label", title: "Değer", type: "text", width: 110,  editing: false, inserting: false},
-                    {type: "control",deleteButton: false}]
+                    {
+                        name: "name", title: "Cihaz adı", type: "text", width: 110, validate: function (value, item) {
+                            return item.name.length > 2 && item.name.length < 15
+                        }
+                    },
+                    {name: "status", title: "Durum", type: "checkbox", width: 80, inserting: false},
+                    {name: "is_active", title: "Aktif", type: "checkbox", width: 80, inserting: false},
+                    {name: "label", title: "Değer", type: "text", width: 110, editing: false, inserting: false},
+                    {type: "control", deleteButton: false}]
             });
         });
     </script>

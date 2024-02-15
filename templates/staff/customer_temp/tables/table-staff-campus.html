@@ -93,6 +93,8 @@
 
                         success: function (response) {
                             const {success} = response
+
+                             console.log("tamam yaptım",success)
                             if (success) {
 
                                 args.item.id = response.data.new_apartments_id
@@ -107,6 +109,8 @@
                                 ap_id = args.item.id
                                 $("#id_label_ap_name").text("Yerleşke : "+args.item.name);
                                 $("#jsGridDevices").jsGrid("loadData");
+
+                                console.log("tamam yaptım")
 
 
                             } else {
